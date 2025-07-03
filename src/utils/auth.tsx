@@ -36,7 +36,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
 
   const signIn = async ({ token, authUserState }: { token: string; authUserState: any }) => {
     try {
-      const response = await fetch("/api/auth/signin", {
+      const response = await fetch("/api/auth/sign_in", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, authUserState }),
@@ -54,7 +54,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
 
   const signOut = async () => {
     try {
-      const response = await fetch("/api/auth/signout", {
+      const response = await fetch("/api/auth/sign_out", {
         method: "POST",
       });
       if (response.ok) {
