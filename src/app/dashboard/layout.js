@@ -1,8 +1,8 @@
 import "../globals.css";
 
 export const metadata = {
-  title: "Login",
-  description: "Login",
+  title: "Dashboard",
+  description: "Dashboard",
 };
 
 export default function RootLayout({ children }) {
