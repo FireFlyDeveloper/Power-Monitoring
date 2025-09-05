@@ -2,24 +2,49 @@
 
 import React, { useState } from "react";
 import "../globals.css";
+import { useAuth } from "../../utils/auth";
 
 export default function Login() {
+  const { signIn } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username || !password) {
       alert("Please fill in all fields");
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      alert(`Login successful!\n\nUsername: ${username}\n\nRedirecting to dashboard...`);
+    try {
+      const response = await fetch(`http://localhost:3001/auth/user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        alert("Login failed. Please check your credentials.");
+        return;
+      }
+
+      const data = await response.json();
+
+      if (signIn({ token: data.token, authUserState: data.authUserState })) {
+        alert("Login successful!");
+        window.location.href = "/dashboard";
+      } else {
+        alert("Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("An error occurred while trying to log in. Please try again later.");
+    }
       setLoading(false);
-    }, 1500);
   };
 
   return (
