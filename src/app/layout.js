@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Introduction",
-  description: "Introduction",
+  title: "Green Energy",
+  description: "Green Energy",
 };
 
 export default function RootLayout({ children }) {
