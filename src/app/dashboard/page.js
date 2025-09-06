@@ -49,7 +49,7 @@ const Dashboard = () => {
     let reconnectTimeout;
 
     const connectWebSocket = () => {
-      ws.current = new WebSocket("ws://localhost:3001/ws/data");
+      ws.current = new WebSocket("wss://power-monitoring-backend.onrender.com/ws/data");
 
       ws.current.onopen = () => {
         console.log("WebSocket connected");
