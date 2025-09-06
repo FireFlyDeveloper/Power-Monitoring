@@ -42,7 +42,6 @@ export default function Login() {
       const data = await response.json();
 
       if (signIn({ token: data.token, authUserState: data.authUserState })) {
-        alert("Login successful!");
         window.location.href = "/dashboard";
       } else {
         setError("Login failed. Please try again.");
