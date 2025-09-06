@@ -35,6 +35,9 @@ const Dashboard = () => {
   const profileRef = useRef(null);
   const changePasswordRef = useRef(null);
 
+  // Add state for selected date
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   const [changePasswordData, setChangePasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -183,11 +186,10 @@ const Dashboard = () => {
     return () => clearTimeout(reconnectTimeout);
   }, []);
 
-  // Request history every 10 minutes
+  // Request history when selected date changes
   useEffect(() => {
-    const interval = setInterval(requestHistory, 10 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
+    requestHistory();
+  }, [selectedDate]);
 
   // Request system status every minute
   useEffect(() => {
@@ -198,10 +200,8 @@ const Dashboard = () => {
   const requestHistory = () => {
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
 
-    const now = new Date();
-    const start = new Date(now);
+    const start = new Date(selectedDate);
     start.setHours(8, 0, 0, 0);
-    if (now < start) start.setDate(start.getDate() - 1);
     const end = new Date(start);
     end.setDate(end.getDate() + 1);
     end.setHours(7, 59, 59, 999);
@@ -407,6 +407,16 @@ const Dashboard = () => {
     ],
   };
 
+  // Format date for display
+  const formatDateDisplay = (date) => {
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-emerald-900 text-white p-6 relative overflow-hidden">
       {/* Floating background elements */}
@@ -606,14 +616,37 @@ const Dashboard = () => {
           />
         </div>
 
+        {/* Date Selector */}
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Historical Data</h2>
+          <div className="flex items-center space-x-3">
+            <span className="text-sm text-teal-100/80">View data for:</span>
+            <input
+              type="date"
+              value={selectedDate.toISOString().split('T')[0]}
+              onChange={(e) => setSelectedDate(new Date(e.target.value))}
+              className="bg-slate-800/50 border border-teal-500/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
+            <div className="text-sm text-teal-100/60">
+              {formatDateDisplay(selectedDate)}
+            </div>
+            <button
+              onClick={() => setSelectedDate(new Date())}
+              className="px-3 py-2 text-sm rounded-lg bg-cyan-600 hover:bg-cyan-500 transition-colors"
+            >
+              Today
+            </button>
+          </div>
+        </div>
+
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="glass rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Temperature & RPM (Last 24 Hours)</h3>
+            <h3 className="text-lg font-semibold mb-4">Temperature & RPM</h3>
             <Line data={tempRpmChart} options={chartOptions} />
           </div>
           <div className="glass rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Voltage & Power Usage (Last 24 Hours)</h3>
+            <h3 className="text-lg font-semibold mb-4">Voltage & Power Usage</h3>
             <Line data={voltagePowerChart} options={chartOptions} />
           </div>
         </div>
