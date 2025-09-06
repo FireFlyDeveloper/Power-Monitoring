@@ -19,7 +19,7 @@ export default function Login() {
     }
     setLoading(true);
     try {
-      const response = await fetch(`https://green-energy.fireflylab.top/auth/user`, {
+      const response = await fetch(`https://power-monitoring-backend.onrender.com/auth/user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

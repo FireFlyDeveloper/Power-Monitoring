@@ -102,8 +102,13 @@ const Dashboard = () => {
   useEffect(() => {
     let reconnectTimeout;
 
-    const connectWebSocket = () => {
-      ws.current = new WebSocket("wss://green-energy.fireflylab.top/ws/data");
+    const connectWebSocket = async () => {
+      const token = await fetch("/api/auth/get", { method: 'POST' });
+      const session = await token.json();
+
+      ws.current = new WebSocket(
+        `wss://power-monitoring-backend.onrender.com/ws/data?token=${encodeURIComponent(session.token)}`
+      );
 
       ws.current.onopen = () => {
         console.log("WebSocket connected");
