@@ -19,7 +19,7 @@ export default function Login() {
     }
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/auth/user`, {
+      const response = await fetch(`https://energy-app.fireflylab.top/auth/user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
