@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // import useRouter
 
 const AuthContext = createContext({
   isAuthenticated: false,
@@ -10,6 +11,7 @@ const AuthContext = createContext({
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter(); // initialize router
 
   const signIn = async ({ token, authUserState }) => {
     try {
@@ -36,6 +38,7 @@ export function AuthProvider({ children }) {
       });
       if (response.ok) {
         setIsAuthenticated(false);
+        router.push("/login"); // redirect after sign out
         return true;
       }
       return false;

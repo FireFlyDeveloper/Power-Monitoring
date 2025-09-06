@@ -14,6 +14,7 @@ import {
   TimeScale,
 } from "chart.js";
 import 'chartjs-adapter-date-fns';
+import { useAuth } from "../../utils/auth";
 
 ChartJS.register(
   CategoryScale,
@@ -28,6 +29,9 @@ ChartJS.register(
 
 const Dashboard = () => {
   const ws = useRef(null);
+  const { signOut } = useAuth();
+  const [showProfilePopup, setShowProfilePopup] = useState(false);
+  const profileRef = useRef(null);
 
   const [metrics, setMetrics] = useState({
     temperature: 0,
@@ -52,6 +56,20 @@ const Dashboard = () => {
     lastUpdate: null,
     alerts: []
   });
+
+  // Close profile popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfilePopup(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Connect to WebSocket
   useEffect(() => {
@@ -311,11 +329,55 @@ const Dashboard = () => {
               <p className="text-teal-100/70">Real-time sensor monitoring</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 ${systemStatus.gridConnection ? 'bg-green-400' : 'bg-red-400'} rounded-full animate-pulse`}></div>
-            <span className="text-sm text-teal-100/80">
-              {systemStatus.gridConnection ? 'System Online' : 'System Offline'}
-            </span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <div className={`w-3 h-3 ${systemStatus.gridConnection ? 'bg-green-400' : 'bg-red-400'} rounded-full animate-pulse`}></div>
+              <span className="text-sm text-teal-100/80">
+                {systemStatus.gridConnection ? 'System Online' : 'System Offline'}
+              </span>
+            </div>
+            
+            {/* Profile Icon */}
+            <div className="relative" ref={profileRef}>
+              <button 
+                onClick={() => setShowProfilePopup(!showProfilePopup)}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-600 hover:bg-cyan-500 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </button>
+              
+              {/* Profile Popup */}
+              {showProfilePopup && (
+                <div className="absolute right-0 mt-2 w-48 glass rounded-lg shadow-lg py-1 z-50">
+                  <div className="px-4 py-2 border-b border-teal-500/20">
+                    <p className="text-sm font-medium">Admin User</p>
+                    <p className="text-xs text-teal-100/60">System Administrator</p>
+                  </div>
+                  
+                  <button 
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-teal-700/30 transition-colors"
+                    onClick={() => {
+                      // Handle change password functionality
+                      alert("Change password functionality would open here");
+                    }}
+                  >
+                    Change Password
+                  </button>
+                  
+                  <button 
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-teal-700/30 transition-colors"
+                    onClick={() => {
+                      signOut();
+                      setShowProfilePopup(false);
+                    }}
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
