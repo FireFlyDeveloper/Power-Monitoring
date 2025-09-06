@@ -426,7 +426,7 @@ const Dashboard = () => {
               </svg>
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Wind Turbine Monitor</h1>
+              <h1 className="text-2xl font-bold">Green Energy Monitor</h1>
               <p className="text-teal-100/70">Real-time sensor monitoring</p>
             </div>
           </div>
