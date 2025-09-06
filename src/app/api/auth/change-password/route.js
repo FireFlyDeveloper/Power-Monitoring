@@ -11,7 +11,7 @@ export async function POST(request) {
         const cookie = await cookies();
         const session = cookie.get('session');
 
-        const response = await fetch(`http://${process.env.API_URL}:8080/auth/update-password`, {
+        const response = await fetch(`${process.env.API_URL}/auth/update-password`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",

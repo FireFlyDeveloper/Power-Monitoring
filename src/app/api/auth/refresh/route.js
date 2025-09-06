@@ -11,7 +11,7 @@ export async function POST() {
     }
 
     // Replace with your actual refresh token URL
-    const response = await fetch(`http://${process.env.API_URL}:8080/auth/refresh`, {
+    const response = await fetch(`${process.env.API_URL}/auth/refresh`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
