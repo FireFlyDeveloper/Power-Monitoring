@@ -10,14 +10,6 @@ _A modern real-time energy monitoring dashboard built with Next.js, WebSockets, 
 -   📊 **Real-Time Monitoring**
     
     -   Temperature, RPM, Voltage, and Energy Usage.
-        
-    -   RPM logic with three clear states:
-        
-        -   `Normal` → 0–1200
-            
-        -   `Optimal` → 1201–1500
-            
-        -   `Warning` → >1500
             
 -   ⚡ **Live WebSocket Updates**
     
@@ -76,14 +68,4 @@ Dashboard will be available at 👉 [http://localhost:3000](http://localhost:300
     
 -    **Backend:** [Power-Monitoring-Backend](https://github.com/FireFlyDeveloper/Power-Monitoring-Backend.git)
     
-----------
-
-## ⚡ RPM Status Animation
-
--   🟡 **Normal (0–1200)**
-    
--   🟢 **Optimal (1201–1500)**
-    
--   🔴 **Warning (>1500)**
-
 ----------
