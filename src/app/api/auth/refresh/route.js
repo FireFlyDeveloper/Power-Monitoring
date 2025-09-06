@@ -11,7 +11,7 @@ export async function POST() {
     }
 
     // Replace with your actual refresh token URL
-    const response = await fetch(`https://energy-app.fireflylab.top/auth/refresh`, {
+    const response = await fetch(`https://green-energy.fireflylab.top/auth/refresh`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

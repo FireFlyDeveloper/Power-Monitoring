@@ -103,7 +103,7 @@ const Dashboard = () => {
     let reconnectTimeout;
 
     const connectWebSocket = () => {
-      ws.current = new WebSocket("wss://energy-app.fireflylab.top/ws/data");
+      ws.current = new WebSocket("wss://green-energy.fireflylab.top/ws/data");
 
       ws.current.onopen = () => {
         console.log("WebSocket connected");

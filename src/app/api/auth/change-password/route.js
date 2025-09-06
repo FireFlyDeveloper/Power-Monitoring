@@ -11,7 +11,7 @@ export async function POST(request) {
         const cookie = await cookies();
         const session = cookie.get('session');
 
-        const response = await fetch(`https://energy-app.fireflylab.top/auth/update-password`, {
+        const response = await fetch(`https://green-energy.fireflylab.top/auth/update-password`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
