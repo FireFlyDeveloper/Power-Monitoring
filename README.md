@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🌱 Green Energy Monitor Dashboard
 
-## Getting Started
+![Dashboard Preview](https://github.com/FireFlyDeveloper/Power-Monitoring/blob/main/public/image.png)  
+_A modern real-time energy monitoring dashboard built with Next.js, WebSockets, and Chart.js._
 
-First, run the development server:
+----------
+
+## ✨ Features
+
+-   📊 **Real-Time Monitoring**
+    
+    -   Temperature, RPM, Voltage, and Energy Usage.
+        
+    -   RPM logic with three clear states:
+        
+        -   `Normal` → 0–1200
+            
+        -   `Optimal` → 1201–1500
+            
+        -   `Warning` → >1500
+            
+-   ⚡ **Live WebSocket Updates**
+    
+    -   Automatic reconnection.
+        
+    -   Real-time system status and alerts.
+        
+-   📈 **Interactive Charts**
+    
+    -   Dual-axis Chart.js graphs for Temperature/RPM and Voltage/Power Usage.
+        
+    -   Historical data filter by date.
+        
+-   🔐 **Authentication & Profile**
+    
+    -   Secure password change popup.
+        
+    -   Sign-out option with graceful handling.
+        
+-   🎨 **Modern UI**
+    
+    -   TailwindCSS + glassmorphism.
+        
+    -   Smooth floating background animations.
+        
+
+----------
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone & Install
+
+```bash
+git clone https://github.com/FireFlyDeveloper/Power-Monitoring.git
+cd Power-Monitoring
+npm install
+
+```
+
+### 2️⃣ Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Dashboard will be available at 👉 [http://localhost:3000](http://localhost:3000/)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+----------
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Tech Stack
 
-## Learn More
+-   **Frontend:** Next.js 15+, React, TailwindCSS, shadcn/ui
+    
+-   **Charts:** Chart.js + chartjs-adapter-date-fns
+    
+-    **Backend:** [Power-Monitoring-Backend](https://github.com/FireFlyDeveloper/Power-Monitoring-Backend.git)
+    
+----------
 
-To learn more about Next.js, take a look at the following resources:
+## ⚡ RPM Status Animation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+-   🟡 **Normal (0–1200)**
+    
+-   🟢 **Optimal (1201–1500)**
+    
+-   🔴 **Warning (>1500)**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+----------
