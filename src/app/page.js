@@ -24,7 +24,7 @@ const Navbar = () => {
             </svg>
           </div>
           <div>
-            <h1 className="text-xl font-bold">Green Power Monitor</h1>
+            <h1 className="text-xl font-bold">Green Energy Monitor</h1>
             <p className="text-xs text-teal-100/70">Sensor Data Monitoring</p>
           </div>
         </div>
@@ -53,7 +53,7 @@ const Hero = () => {
     <section className="relative z-10 px-6 py-16 text-center">
       <div className="max-w-4xl mx-auto fade-in">
         <h2 className="text-4xl md:text-6xl font-extrabold mb-6 bg-gradient-to-r from-cyan-300 to-emerald-300 bg-clip-text text-transparent">
-          Real-time Green Power Monitoring
+          Real-time Green Energy Monitoring
         </h2>
         <p className="text-xl md:text-2xl text-teal-100/80 mb-8 max-w-2xl mx-auto">
           Track consumption, voltage, turbine speed, and temperature with live sensor data

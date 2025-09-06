@@ -602,6 +602,11 @@ const Dashboard = () => {
             iconColor="red"
             range="-10°C to 50°C"
             status={metrics.temperature > 45 ? "Warning" : "Normal"}
+            icon={
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+            }
           />
           <MetricCard
             title="RPM"
@@ -613,6 +618,12 @@ const Dashboard = () => {
               : metrics.rpm > 1200 && metrics.rpm <= 1500
                 ? "Optimal"
                 : "Warning"}
+            icon={
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+            }
           />
           <MetricCard
             title="Voltage"
@@ -620,13 +631,24 @@ const Dashboard = () => {
             iconColor="yellow"
             range="220V ±5%"
             status={metrics.voltage < 209 || metrics.voltage > 231 ? "Warning" : "Stable"}
+            icon={
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+            }
           />
           <MetricCard
-            title="Energy Usage"
+            title="Energy Output"
             value={formatValue("kwh", metrics.kwh)}
             iconColor="green"
             range={isToday() ? `Today: ${todayKwh.toFixed(1)} kWh` : `${selectedDate.toLocaleDateString()}: ${todayKwh.toFixed(1)} kWh`}
             status={getKwhStatus(metrics.kwh)}
+            icon={
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z" stroke="currentColor" strokeWidth="2"/>
+                <path d="M8 1v4m8-4v4" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+            }
           />
         </div>
 
@@ -660,7 +682,7 @@ const Dashboard = () => {
             <Line data={tempRpmChart} options={chartOptions} />
           </div>
           <div className="glass rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Voltage & Power Usage</h3>
+            <h3 className="text-lg font-semibold mb-4">Voltage & Power Output</h3>
             <Line data={voltagePowerChart} options={chartOptions} />
           </div>
         </div>
@@ -722,7 +744,7 @@ const Dashboard = () => {
   );
 };
 
-const MetricCard = ({ title, value, iconColor, range, status }) => {
+const MetricCard = ({ title, value, iconColor, range, status, icon }) => {
   // Determine status color based on status text
   const getStatusColor = (status) => {
     if (status.includes("Warning")) return "text-red-400";
@@ -741,9 +763,7 @@ const MetricCard = ({ title, value, iconColor, range, status }) => {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
           <div className={`w-8 h-8 bg-${iconColor}-500/20 rounded-lg flex items-center justify-center`}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" stroke="currentColor" className={`text-${iconColor}-400`} strokeWidth="2" />
-            </svg>
+            {icon}
           </div>
           <span className="text-sm text-teal-100/80">{title}</span>
         </div>
