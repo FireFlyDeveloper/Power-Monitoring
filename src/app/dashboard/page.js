@@ -85,9 +85,9 @@ const Dashboard = () => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfilePopup(false);
       }
-      
-      if (changePasswordRef.current && !changePasswordRef.current.contains(event.target) && 
-          !event.target.closest('.profile-option')) {
+
+      if (changePasswordRef.current && !changePasswordRef.current.contains(event.target) &&
+        !event.target.closest('.profile-option')) {
         setShowChangePassword(false);
       }
     };
@@ -113,11 +113,11 @@ const Dashboard = () => {
 
       ws.current.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        
+
         if (message.data?.action === "update") {
           setMetrics((prev) => ({ ...prev, ...message.data.data }));
         }
-        
+
         if (message.action === "lastData") {
           setMetrics({
             temperature: message.data.temperature,
@@ -126,7 +126,7 @@ const Dashboard = () => {
             kwh: message.data.kwh,
           });
         }
-        
+
         if (message.action === "history") {
           const history = message.data;
           const labels = history.map((d) => new Date(d.created_at));
@@ -154,7 +154,7 @@ const Dashboard = () => {
             power: kwhData,
           });
         }
-        
+
         // Handle system status updates
         if (message.action === "systemStatus") {
           setSystemStatus({
@@ -165,7 +165,7 @@ const Dashboard = () => {
             alerts: message.data.alerts || []
           });
         }
-        
+
         // Handle alerts
         if (message.action === "alert") {
           setSystemStatus(prev => ({
@@ -227,7 +227,7 @@ const Dashboard = () => {
 
   const requestSystemStatus = () => {
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
-    
+
     ws.current.send(
       JSON.stringify({
         action: "getSystemStatus"
@@ -237,14 +237,14 @@ const Dashboard = () => {
 
   const acknowledgeAlert = (alertId) => {
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
-    
+
     ws.current.send(
       JSON.stringify({
         action: "acknowledgeAlert",
         alertId: alertId
       })
     );
-    
+
     // Remove the acknowledged alert from local state
     setSystemStatus(prev => ({
       ...prev,
@@ -258,7 +258,7 @@ const Dashboard = () => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear errors when typing
     if (changePasswordErrors[name]) {
       setChangePasswordErrors(prev => ({
@@ -270,35 +270,35 @@ const Dashboard = () => {
 
   const validateChangePassword = () => {
     const errors = {};
-    
+
     if (!changePasswordData.currentPassword) {
       errors.currentPassword = "Current password is required";
     }
-    
+
     if (!changePasswordData.newPassword) {
       errors.newPassword = "New password is required";
     } else if (changePasswordData.newPassword.length < 6) {
       errors.newPassword = "Password must be at least 6 characters";
     }
-    
+
     if (!changePasswordData.confirmPassword) {
       errors.confirmPassword = "Please confirm your new password";
     } else if (changePasswordData.newPassword !== changePasswordData.confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
     }
-    
+
     setChangePasswordErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    
+
     if (!validateChangePassword()) return;
-    
+
     setIsChangingPassword(true);
     setChangePasswordMessage("");
-    
+
     try {
       const response = await fetch("/api/auth/change-password", {
         method: "POST",
@@ -310,9 +310,9 @@ const Dashboard = () => {
           newPassword: changePasswordData.newPassword
         }),
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         setChangePasswordMessage("Password changed successfully");
         setChangePasswordData({
@@ -320,7 +320,7 @@ const Dashboard = () => {
           newPassword: "",
           confirmPassword: ""
         });
-        
+
         // Close the popup after a delay
         setTimeout(() => {
           setShowChangePassword(false);
@@ -419,11 +419,11 @@ const Dashboard = () => {
 
   // Format date for display
   const formatDateDisplay = (date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   };
 
@@ -457,10 +457,10 @@ const Dashboard = () => {
                 {systemStatus.gridConnection ? 'System Online' : 'System Offline'}
               </span>
             </div>
-            
+
             {/* Profile Icon */}
             <div className="relative" ref={profileRef}>
-              <button 
+              <button
                 onClick={() => setShowProfilePopup(!showProfilePopup)}
                 className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-600 hover:bg-cyan-500 transition-colors"
               >
@@ -468,7 +468,7 @@ const Dashboard = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </button>
-              
+
               {/* Profile Popup */}
               {showProfilePopup && (
                 <div className="absolute right-0 mt-2 w-48 glass rounded-lg shadow-lg py-1 z-50">
@@ -476,8 +476,8 @@ const Dashboard = () => {
                     <p className="text-sm font-medium">Admin User</p>
                     <p className="text-xs text-teal-100/60">System Administrator</p>
                   </div>
-                  
-                  <button 
+
+                  <button
                     className="block w-full text-left px-4 py-2 text-sm hover:bg-teal-700/30 transition-colors profile-option"
                     onClick={() => {
                       setShowChangePassword(true);
@@ -486,8 +486,8 @@ const Dashboard = () => {
                   >
                     Change Password
                   </button>
-                  
-                  <button 
+
+                  <button
                     className="block w-full text-left px-4 py-2 text-sm hover:bg-teal-700/30 transition-colors"
                     onClick={() => {
                       signOut();
@@ -505,13 +505,13 @@ const Dashboard = () => {
         {/* Change Password Popup */}
         {showChangePassword && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div 
+            <div
               ref={changePasswordRef}
               className="glass rounded-xl p-6 w-full max-w-md"
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Change Password</h3>
-                <button 
+                <button
                   onClick={() => setShowChangePassword(false)}
                   className="text-teal-100/70 hover:text-white"
                 >
@@ -520,7 +520,7 @@ const Dashboard = () => {
                   </svg>
                 </button>
               </div>
-              
+
               <form onSubmit={handleChangePassword} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Current Password</label>
@@ -536,7 +536,7 @@ const Dashboard = () => {
                     <p className="text-red-400 text-xs mt-1">{changePasswordErrors.currentPassword}</p>
                   )}
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium mb-1">New Password</label>
                   <input
@@ -551,7 +551,7 @@ const Dashboard = () => {
                     <p className="text-red-400 text-xs mt-1">{changePasswordErrors.newPassword}</p>
                   )}
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium mb-1">Confirm New Password</label>
                   <input
@@ -566,13 +566,13 @@ const Dashboard = () => {
                     <p className="text-red-400 text-xs mt-1">{changePasswordErrors.confirmPassword}</p>
                   )}
                 </div>
-                
+
                 {changePasswordMessage && (
                   <p className={`text-sm ${changePasswordMessage.includes("successfully") ? "text-green-400" : "text-red-400"}`}>
                     {changePasswordMessage}
                   </p>
                 )}
-                
+
                 <div className="flex justify-end space-x-3 pt-2">
                   <button
                     type="button"
@@ -596,33 +596,37 @@ const Dashboard = () => {
 
         {/* Real-time Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <MetricCard 
-            title="Temperature" 
-            value={formatValue("temperature", metrics.temperature)} 
-            iconColor="red" 
-            range="-10°C to 50°C" 
-            status={metrics.temperature > 45 ? "Warning" : "Normal"} 
+          <MetricCard
+            title="Temperature"
+            value={formatValue("temperature", metrics.temperature)}
+            iconColor="red"
+            range="-10°C to 50°C"
+            status={metrics.temperature > 45 ? "Warning" : "Normal"}
           />
-          <MetricCard 
-            title="RPM" 
-            value={formatValue("rpm", metrics.rpm)} 
-            iconColor="blue" 
-            range="1,200-1,500" 
-            status={metrics.rpm < 1200 || metrics.rpm > 1500 ? "Warning" : "Optimal"} 
+          <MetricCard
+            title="RPM"
+            value={formatValue("rpm", metrics.rpm)}
+            iconColor="blue"
+            range="0-1,500"
+            status={metrics.rpm <= 1200
+              ? "Normal"
+              : metrics.rpm > 1200 && metrics.rpm <= 1500
+                ? "Optimal"
+                : "Warning"}
           />
-          <MetricCard 
-            title="Voltage" 
-            value={formatValue("voltage", metrics.voltage)} 
-            iconColor="yellow" 
-            range="220V ±5%" 
-            status={metrics.voltage < 209 || metrics.voltage > 231 ? "Warning" : "Stable"} 
+          <MetricCard
+            title="Voltage"
+            value={formatValue("voltage", metrics.voltage)}
+            iconColor="yellow"
+            range="220V ±5%"
+            status={metrics.voltage < 209 || metrics.voltage > 231 ? "Warning" : "Stable"}
           />
-          <MetricCard 
-            title="Energy Usage" 
-            value={formatValue("kwh", metrics.kwh)} 
-            iconColor="green" 
-            range={isToday() ? `Today: ${todayKwh.toFixed(1)} kWh` : `${selectedDate.toLocaleDateString()}: ${todayKwh.toFixed(1)} kWh`} 
-            status={getKwhStatus(metrics.kwh)} 
+          <MetricCard
+            title="Energy Usage"
+            value={formatValue("kwh", metrics.kwh)}
+            iconColor="green"
+            range={isToday() ? `Today: ${todayKwh.toFixed(1)} kWh` : `${selectedDate.toLocaleDateString()}: ${todayKwh.toFixed(1)} kWh`}
+            status={getKwhStatus(metrics.kwh)}
           />
         </div>
 
@@ -671,25 +675,25 @@ const Dashboard = () => {
               </span>
             )}
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <StatusIndicator 
-              title="Turbine Operational" 
-              status={systemStatus.turbineOperational} 
-              description={systemStatus.turbineOperational ? "Turbine running normally" : "Turbine offline or in maintenance"} 
+            <StatusIndicator
+              title="Turbine Operational"
+              status={systemStatus.turbineOperational}
+              description={systemStatus.turbineOperational ? "Turbine running normally" : "Turbine offline or in maintenance"}
             />
-            <StatusIndicator 
-              title="Grid Connection Stable" 
-              status={systemStatus.gridConnection} 
-              description={systemStatus.gridConnection ? "Connected to power grid" : "Disconnected from grid"} 
+            <StatusIndicator
+              title="Grid Connection Stable"
+              status={systemStatus.gridConnection}
+              description={systemStatus.gridConnection ? "Connected to power grid" : "Disconnected from grid"}
             />
-            <StatusIndicator 
-              title="All Sensors Active" 
-              status={systemStatus.sensorsActive} 
-              description={systemStatus.sensorsActive ? "All sensors reporting data" : "Some sensors not responding"} 
+            <StatusIndicator
+              title="All Sensors Active"
+              status={systemStatus.sensorsActive}
+              description={systemStatus.sensorsActive ? "All sensors reporting data" : "Some sensors not responding"}
             />
           </div>
-          
+
           {/* Alerts Section */}
           {systemStatus.alerts.length > 0 && (
             <div className="mt-4">
@@ -701,7 +705,7 @@ const Dashboard = () => {
                       <div className="w-2 h-2 bg-red-400 rounded-full mr-2"></div>
                       <span className="text-sm">{alert.message}</span>
                     </div>
-                    <button 
+                    <button
                       onClick={() => acknowledgeAlert(alert.id)}
                       className="text-xs bg-red-400/20 hover:bg-red-400/30 px-2 py-1 rounded"
                     >
