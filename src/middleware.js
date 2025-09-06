@@ -1,10 +1,30 @@
 import { NextResponse } from "next/server";
 
-export function middleware(request) {
+export async function middleware(request) {
   const token = request.cookies.get("session")?.value;
-
-  const isLoggedIn = !!token;
   const { pathname } = request.nextUrl;
+
+  let isLoggedIn = false;
+
+  if (token) {
+    try {
+      const res = await fetch(`/auth/check`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        isLoggedIn = data?.success === true;
+      }
+    } catch (err) {
+      console.error("Auth check failed:", err);
+      isLoggedIn = false;
+    }
+  }
 
   if (pathname === "/login" && isLoggedIn) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
