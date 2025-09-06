@@ -63,6 +63,8 @@ const Dashboard = () => {
     power: [],
   });
 
+  const [todayKwh, setTodayKwh] = useState(0);
+
   // System status state
   const [systemStatus, setSystemStatus] = useState({
     turbineOperational: false,
@@ -71,6 +73,11 @@ const Dashboard = () => {
     lastUpdate: null,
     alerts: []
   });
+
+  const isToday = () => {
+    const today = new Date();
+    return selectedDate.toDateString() === today.toDateString();
+  };
 
   // Close popups when clicking outside
   useEffect(() => {
@@ -135,6 +142,9 @@ const Dashboard = () => {
           const kwhData = history
             .filter((d) => d.sensor_type === "kwh")
             .map((d) => ({ x: new Date(d.created_at), y: parseFloat(d.avg_value) }));
+
+          const totalKwh = kwhData.reduce((sum, dataPoint) => sum + dataPoint.y, 0);
+          setTodayKwh(totalKwh);
 
           setChartData({
             labels,
@@ -611,7 +621,7 @@ const Dashboard = () => {
             title="Energy Usage" 
             value={formatValue("kwh", metrics.kwh)} 
             iconColor="green" 
-            range="Today: 127 kWh" 
+            range={isToday() ? `Today: ${todayKwh.toFixed(1)} kWh` : `${selectedDate.toLocaleDateString()}: ${todayKwh.toFixed(1)} kWh`} 
             status={getKwhStatus(metrics.kwh)} 
           />
         </div>
