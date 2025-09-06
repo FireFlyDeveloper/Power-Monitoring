@@ -11,21 +11,6 @@ const AuthContext = createContext({
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const response = await fetch("/api/auth/check");
-      const data = await response.json();
-      setIsAuthenticated(data.isAuthenticated);
-    } catch (error) {
-      console.error("Error checking auth:", error);
-      setIsAuthenticated(false);
-    }
-  };
-
   const signIn = async ({ token, authUserState }) => {
     try {
       const response = await fetch("/api/auth/signin", {
