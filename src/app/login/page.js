@@ -200,16 +200,6 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Forgot Password */}
-            <div className="text-right">
-              <a
-                href="#"
-                className="text-sm text-cyan-300 hover:text-cyan-200 transition-colors"
-              >
-                Forgot password?
-              </a>
-            </div>
-
             {/* Submit */}
             <button
               type="submit"
