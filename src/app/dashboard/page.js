@@ -31,7 +31,19 @@ const Dashboard = () => {
   const ws = useRef(null);
   const { signOut } = useAuth();
   const [showProfilePopup, setShowProfilePopup] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const profileRef = useRef(null);
+  const changePasswordRef = useRef(null);
+
+  const [changePasswordData, setChangePasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+
+  const [changePasswordErrors, setChangePasswordErrors] = useState({});
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [changePasswordMessage, setChangePasswordMessage] = useState("");
 
   const [metrics, setMetrics] = useState({
     temperature: 0,
@@ -57,11 +69,16 @@ const Dashboard = () => {
     alerts: []
   });
 
-  // Close profile popup when clicking outside
+  // Close popups when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfilePopup(false);
+      }
+      
+      if (changePasswordRef.current && !changePasswordRef.current.contains(event.target) && 
+          !event.target.closest('.profile-option')) {
+        setShowChangePassword(false);
       }
     };
 
@@ -225,6 +242,90 @@ const Dashboard = () => {
     }));
   };
 
+  const handleChangePasswordInput = (e) => {
+    const { name, value } = e.target;
+    setChangePasswordData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear errors when typing
+    if (changePasswordErrors[name]) {
+      setChangePasswordErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
+  };
+
+  const validateChangePassword = () => {
+    const errors = {};
+    
+    if (!changePasswordData.currentPassword) {
+      errors.currentPassword = "Current password is required";
+    }
+    
+    if (!changePasswordData.newPassword) {
+      errors.newPassword = "New password is required";
+    } else if (changePasswordData.newPassword.length < 6) {
+      errors.newPassword = "Password must be at least 6 characters";
+    }
+    
+    if (!changePasswordData.confirmPassword) {
+      errors.confirmPassword = "Please confirm your new password";
+    } else if (changePasswordData.newPassword !== changePasswordData.confirmPassword) {
+      errors.confirmPassword = "Passwords do not match";
+    }
+    
+    setChangePasswordErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    
+    if (!validateChangePassword()) return;
+    
+    setIsChangingPassword(true);
+    setChangePasswordMessage("");
+    
+    try {
+      const response = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          currentPassword: changePasswordData.currentPassword,
+          newPassword: changePasswordData.newPassword
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setChangePasswordMessage("Password changed successfully");
+        setChangePasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: ""
+        });
+        
+        // Close the popup after a delay
+        setTimeout(() => {
+          setShowChangePassword(false);
+          setChangePasswordMessage("");
+        }, 2000);
+      } else {
+        setChangePasswordMessage(data.message || "Failed to change password");
+      }
+    } catch (error) {
+      setChangePasswordMessage("An error occurred. Please try again.");
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
   const formatValue = (key, value) => {
     switch (key) {
       case "temperature":
@@ -357,10 +458,10 @@ const Dashboard = () => {
                   </div>
                   
                   <button 
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-teal-700/30 transition-colors"
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-teal-700/30 transition-colors profile-option"
                     onClick={() => {
-                      // Handle change password functionality
-                      alert("Change password functionality would open here");
+                      setShowChangePassword(true);
+                      setShowProfilePopup(false);
                     }}
                   >
                     Change Password
@@ -380,6 +481,98 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+
+        {/* Change Password Popup */}
+        {showChangePassword && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div 
+              ref={changePasswordRef}
+              className="glass rounded-xl p-6 w-full max-w-md"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Change Password</h3>
+                <button 
+                  onClick={() => setShowChangePassword(false)}
+                  className="text-teal-100/70 hover:text-white"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+              
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Current Password</label>
+                  <input
+                    type="password"
+                    name="currentPassword"
+                    value={changePasswordData.currentPassword}
+                    onChange={handleChangePasswordInput}
+                    className="w-full bg-slate-800/50 border border-teal-500/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    placeholder="Enter current password"
+                  />
+                  {changePasswordErrors.currentPassword && (
+                    <p className="text-red-400 text-xs mt-1">{changePasswordErrors.currentPassword}</p>
+                  )}
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">New Password</label>
+                  <input
+                    type="password"
+                    name="newPassword"
+                    value={changePasswordData.newPassword}
+                    onChange={handleChangePasswordInput}
+                    className="w-full bg-slate-800/50 border border-teal-500/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    placeholder="Enter new password"
+                  />
+                  {changePasswordErrors.newPassword && (
+                    <p className="text-red-400 text-xs mt-1">{changePasswordErrors.newPassword}</p>
+                  )}
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Confirm New Password</label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={changePasswordData.confirmPassword}
+                    onChange={handleChangePasswordInput}
+                    className="w-full bg-slate-800/50 border border-teal-500/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    placeholder="Confirm new password"
+                  />
+                  {changePasswordErrors.confirmPassword && (
+                    <p className="text-red-400 text-xs mt-1">{changePasswordErrors.confirmPassword}</p>
+                  )}
+                </div>
+                
+                {changePasswordMessage && (
+                  <p className={`text-sm ${changePasswordMessage.includes("successfully") ? "text-green-400" : "text-red-400"}`}>
+                    {changePasswordMessage}
+                  </p>
+                )}
+                
+                <div className="flex justify-end space-x-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowChangePassword(false)}
+                    className="px-4 py-2 text-sm rounded-lg bg-slate-700/50 hover:bg-slate-700/70 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isChangingPassword}
+                    className="px-4 py-2 text-sm rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isChangingPassword ? "Changing..." : "Change Password"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         {/* Real-time Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
