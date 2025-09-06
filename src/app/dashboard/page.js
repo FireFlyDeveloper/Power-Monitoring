@@ -44,23 +44,35 @@ const Dashboard = () => {
     power: [],
   });
 
+  // System status state
+  const [systemStatus, setSystemStatus] = useState({
+    turbineOperational: false,
+    gridConnection: false,
+    sensorsActive: false,
+    lastUpdate: null,
+    alerts: []
+  });
+
   // Connect to WebSocket
   useEffect(() => {
     let reconnectTimeout;
 
     const connectWebSocket = () => {
-      ws.current = new WebSocket("wss://power-monitoring-backend.onrender.com/ws/data");
+      ws.current = new WebSocket("ws://localhost:3001/ws/data");
 
       ws.current.onopen = () => {
         console.log("WebSocket connected");
         requestHistory(); // request initial history
+        requestSystemStatus(); // request system status
       };
 
       ws.current.onmessage = (event) => {
         const message = JSON.parse(event.data);
+        
         if (message.data?.action === "update") {
           setMetrics((prev) => ({ ...prev, ...message.data.data }));
         }
+        
         if (message.action === "lastData") {
           setMetrics({
             temperature: message.data.temperature,
@@ -69,6 +81,7 @@ const Dashboard = () => {
             kwh: message.data.kwh,
           });
         }
+        
         if (message.action === "history") {
           const history = message.data;
           const labels = history.map((d) => new Date(d.created_at));
@@ -92,6 +105,30 @@ const Dashboard = () => {
             voltage: voltageData,
             power: kwhData,
           });
+        }
+        
+        // Handle system status updates
+        if (message.action === "systemStatus") {
+          setSystemStatus({
+            turbineOperational: message.data.turbine_operational,
+            gridConnection: message.data.grid_connection_stable,
+            sensorsActive: message.data.all_sensors_active,
+            lastUpdate: new Date(message.data.timestamp),
+            alerts: message.data.alerts || []
+          });
+        }
+        
+        // Handle alerts
+        if (message.action === "alert") {
+          setSystemStatus(prev => ({
+            ...prev,
+            alerts: [...prev.alerts, {
+              id: message.data.id,
+              message: message.data.message,
+              severity: message.data.severity,
+              timestamp: new Date(message.data.timestamp)
+            }]
+          }));
         }
       };
 
@@ -117,6 +154,12 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Request system status every minute
+  useEffect(() => {
+    const interval = setInterval(requestSystemStatus, 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const requestHistory = () => {
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
 
@@ -137,6 +180,33 @@ const Dashboard = () => {
     );
   };
 
+  const requestSystemStatus = () => {
+    if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
+    
+    ws.current.send(
+      JSON.stringify({
+        action: "getSystemStatus"
+      })
+    );
+  };
+
+  const acknowledgeAlert = (alertId) => {
+    if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
+    
+    ws.current.send(
+      JSON.stringify({
+        action: "acknowledgeAlert",
+        alertId: alertId
+      })
+    );
+    
+    // Remove the acknowledged alert from local state
+    setSystemStatus(prev => ({
+      ...prev,
+      alerts: prev.alerts.filter(alert => alert.id !== alertId)
+    }));
+  };
+
   const formatValue = (key, value) => {
     switch (key) {
       case "temperature":
@@ -150,6 +220,13 @@ const Dashboard = () => {
       default:
         return value;
     }
+  };
+
+  const getKwhStatus = (value) => {
+    if (value === 0) return "No Usage";
+    if (value < 50) return "Low Usage";
+    if (value < 200) return "Normal Usage";
+    return "High Usage";
   };
 
   const chartOptions = {
@@ -202,7 +279,7 @@ const Dashboard = () => {
         yAxisID: "y",
       },
       {
-        label: "Power (kWh)",
+        label: "Power Usage (kWh)",
         data: chartData.power,
         borderColor: "rgb(34, 197, 94)",
         backgroundColor: "rgba(34, 197, 94, 0.1)",
@@ -235,17 +312,43 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-sm text-teal-100/80">System Online</span>
+            <div className={`w-3 h-3 ${systemStatus.gridConnection ? 'bg-green-400' : 'bg-red-400'} rounded-full animate-pulse`}></div>
+            <span className="text-sm text-teal-100/80">
+              {systemStatus.gridConnection ? 'System Online' : 'System Offline'}
+            </span>
           </div>
         </div>
 
         {/* Real-time Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <MetricCard title="Temperature" value={formatValue("temperature", metrics.temperature)} iconColor="red" range="-10°C to 50°C" status="Normal" />
-          <MetricCard title="RPM" value={formatValue("rpm", metrics.rpm)} iconColor="blue" range="1,200-1,500" status="Optimal" />
-          <MetricCard title="Voltage" value={formatValue("voltage", metrics.voltage)} iconColor="yellow" range="220V ±5%" status="Stable" />
-          <MetricCard title="Energy Output" value={formatValue("kwh", metrics.kwh)} iconColor="green" range="Today: +127 kWh" status="Generating" />
+          <MetricCard 
+            title="Temperature" 
+            value={formatValue("temperature", metrics.temperature)} 
+            iconColor="red" 
+            range="-10°C to 50°C" 
+            status={metrics.temperature > 45 ? "Warning" : "Normal"} 
+          />
+          <MetricCard 
+            title="RPM" 
+            value={formatValue("rpm", metrics.rpm)} 
+            iconColor="blue" 
+            range="1,200-1,500" 
+            status={metrics.rpm < 1200 || metrics.rpm > 1500 ? "Warning" : "Optimal"} 
+          />
+          <MetricCard 
+            title="Voltage" 
+            value={formatValue("voltage", metrics.voltage)} 
+            iconColor="yellow" 
+            range="220V ±5%" 
+            status={metrics.voltage < 209 || metrics.voltage > 231 ? "Warning" : "Stable"} 
+          />
+          <MetricCard 
+            title="Energy Usage" 
+            value={formatValue("kwh", metrics.kwh)} 
+            iconColor="green" 
+            range="Today: 127 kWh" 
+            status={getKwhStatus(metrics.kwh)} 
+          />
         </div>
 
         {/* Charts */}
@@ -255,43 +358,108 @@ const Dashboard = () => {
             <Line data={tempRpmChart} options={chartOptions} />
           </div>
           <div className="glass rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Voltage & Power Output (Last 24 Hours)</h3>
+            <h3 className="text-lg font-semibold mb-4">Voltage & Power Usage (Last 24 Hours)</h3>
             <Line data={voltagePowerChart} options={chartOptions} />
           </div>
         </div>
 
         {/* System Status */}
         <div className="mt-8 glass rounded-xl p-6">
-          <h3 className="text-lg font-semibold mb-4">System Status</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {["Turbine Operational", "Grid Connection Stable", "All Sensors Active"].map((status) => (
-              <div key={status} className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-sm">{status}</span>
-              </div>
-            ))}
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">System Status</h3>
+            {systemStatus.lastUpdate && (
+              <span className="text-xs text-teal-100/60">
+                Last update: {systemStatus.lastUpdate.toLocaleTimeString()}
+              </span>
+            )}
           </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <StatusIndicator 
+              title="Turbine Operational" 
+              status={systemStatus.turbineOperational} 
+              description={systemStatus.turbineOperational ? "Turbine running normally" : "Turbine offline or in maintenance"} 
+            />
+            <StatusIndicator 
+              title="Grid Connection Stable" 
+              status={systemStatus.gridConnection} 
+              description={systemStatus.gridConnection ? "Connected to power grid" : "Disconnected from grid"} 
+            />
+            <StatusIndicator 
+              title="All Sensors Active" 
+              status={systemStatus.sensorsActive} 
+              description={systemStatus.sensorsActive ? "All sensors reporting data" : "Some sensors not responding"} 
+            />
+          </div>
+          
+          {/* Alerts Section */}
+          {systemStatus.alerts.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-md font-semibold mb-3 text-red-300">Active Alerts</h4>
+              <div className="space-y-2">
+                {systemStatus.alerts.map(alert => (
+                  <div key={alert.id} className="flex items-center justify-between p-3 bg-red-400/10 rounded-lg border border-red-400/20">
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-red-400 rounded-full mr-2"></div>
+                      <span className="text-sm">{alert.message}</span>
+                    </div>
+                    <button 
+                      onClick={() => acknowledgeAlert(alert.id)}
+                      className="text-xs bg-red-400/20 hover:bg-red-400/30 px-2 py-1 rounded"
+                    >
+                      Acknowledge
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-const MetricCard = ({ title, value, iconColor, range, status }) => (
-  <div className="glass rounded-xl p-6 metric-card">
-    <div className="flex items-center justify-between mb-4">
-      <div className="flex items-center space-x-2">
-        <div className={`w-8 h-8 bg-${iconColor}-500/20 rounded-lg flex items-center justify-center`}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" stroke="currentColor" className={`text-${iconColor}-400`} strokeWidth="2" />
-          </svg>
+const MetricCard = ({ title, value, iconColor, range, status }) => {
+  // Determine status color based on status text
+  const getStatusColor = (status) => {
+    if (status.includes("Warning")) return "text-red-400";
+    if (status.includes("No Usage")) return "text-yellow-400";
+    if (status.includes("Low Usage")) return "text-green-400";
+    if (status.includes("Normal Usage")) return "text-green-400";
+    if (status.includes("High Usage")) return "text-orange-400";
+    if (status.includes("Normal")) return "text-green-400";
+    if (status.includes("Optimal")) return "text-green-400";
+    if (status.includes("Stable")) return "text-green-400";
+    return "text-green-400";
+  };
+
+  return (
+    <div className="glass rounded-xl p-6 metric-card">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-2">
+          <div className={`w-8 h-8 bg-${iconColor}-500/20 rounded-lg flex items-center justify-center`}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" stroke="currentColor" className={`text-${iconColor}-400`} strokeWidth="2" />
+            </svg>
+          </div>
+          <span className="text-sm text-teal-100/80">{title}</span>
         </div>
-        <span className="text-sm text-teal-100/80">{title}</span>
+        <span className={`text-xs ${getStatusColor(status)}`}>{status}</span>
       </div>
-      <span className="text-xs text-green-400">{status}</span>
+      <div className="text-2xl font-bold mb-1">{value}</div>
+      <div className="text-xs text-teal-100/60">{range}</div>
     </div>
-    <div className="text-2xl font-bold mb-1">{value}</div>
-    <div className="text-xs text-teal-100/60">{range}</div>
+  );
+};
+
+const StatusIndicator = ({ title, status, description }) => (
+  <div className="flex items-center space-x-3 p-3 bg-slate-800/30 rounded-lg">
+    <div className={`w-3 h-3 ${status ? "bg-green-400" : "bg-red-400"} rounded-full animate-pulse`}></div>
+    <div>
+      <div className="text-sm">{title}</div>
+      <div className="text-xs text-teal-100/60">{description}</div>
+    </div>
   </div>
 );
 
