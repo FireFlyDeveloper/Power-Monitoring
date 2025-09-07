@@ -42,6 +42,7 @@ export default function Login() {
       const data = await response.json();
 
       if (signIn({ token: data.token, authUserState: data.authUserState })) {
+        alert("Sign in Authorized");
         window.location.href = "/dashboard";
       } else {
         setError("Login failed. Please try again.");
