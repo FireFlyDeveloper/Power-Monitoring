@@ -53,6 +53,7 @@ const Dashboard = () => {
     rpm: 0,
     voltage: 0,
     kwh: 0,
+    current: 0, // Added current metric
   });
 
   const [chartData, setChartData] = useState({
@@ -61,6 +62,7 @@ const Dashboard = () => {
     rpm: [],
     voltage: [],
     power: [],
+    current: [], // Added current data array
   });
 
   const [todayKwh, setTodayKwh] = useState(0);
@@ -129,6 +131,7 @@ const Dashboard = () => {
             rpm: message.data.rpm,
             voltage: message.data.voltage,
             kwh: message.data.kwh,
+            current: message.data.current || 0, // Handle current data
           });
         }
 
@@ -147,6 +150,9 @@ const Dashboard = () => {
           const kwhData = history
             .filter((d) => d.sensor_type === "kwh")
             .map((d) => ({ x: new Date(d.created_at), y: parseFloat(d.avg_value) }));
+          const currentData = history
+            .filter((d) => d.sensor_type === "current")
+            .map((d) => ({ x: new Date(d.created_at), y: parseFloat(d.avg_value) }));
 
           const totalKwh = kwhData.reduce((sum, dataPoint) => sum + dataPoint.y, 0);
           setTodayKwh(totalKwh);
@@ -157,6 +163,7 @@ const Dashboard = () => {
             rpm: rpmData,
             voltage: voltageData,
             power: kwhData,
+            current: currentData,
           });
         }
 
@@ -351,6 +358,8 @@ const Dashboard = () => {
         return value.toFixed(1) + "V";
       case "kwh":
         return value.toLocaleString() + " kWh";
+      case "current":
+        return value.toFixed(2) + "A"; // Format current with 2 decimal places and Ampere unit
       default:
         return value;
     }
@@ -361,6 +370,14 @@ const Dashboard = () => {
     if (value < 50) return "Low Usage";
     if (value < 200) return "Normal Usage";
     return "High Usage";
+  };
+
+  const getCurrentStatus = (value) => {
+    if (value === 0) return "No Load";
+    if (value < 5) return "Low Load";
+    if (value < 15) return "Normal Load";
+    if (value < 25) return "High Load";
+    return "Overload";
   };
 
   const chartOptions = {
@@ -402,7 +419,7 @@ const Dashboard = () => {
     ],
   };
 
-  const voltagePowerChart = {
+  const voltageCurrentChart = {
     labels: chartData.labels,
     datasets: [
       {
@@ -413,11 +430,25 @@ const Dashboard = () => {
         yAxisID: "y",
       },
       {
+        label: "Current (A)",
+        data: chartData.current,
+        borderColor: "rgb(168, 85, 247)",
+        backgroundColor: "rgba(168, 85, 247, 0.1)",
+        yAxisID: "y1",
+      },
+    ],
+  };
+
+  const powerChart = {
+    labels: chartData.labels,
+    datasets: [
+      {
         label: "Power Usage (kWh)",
         data: chartData.power,
         borderColor: "rgb(34, 197, 94)",
         backgroundColor: "rgba(34, 197, 94, 0.1)",
-        yAxisID: "y1",
+        yAxisID: "y",
+        fill: true,
       },
     ],
   };
@@ -600,7 +631,7 @@ const Dashboard = () => {
         )}
 
         {/* Real-time Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <MetricCard
             title="Temperature"
             value={formatValue("temperature", metrics.temperature)}
@@ -609,7 +640,7 @@ const Dashboard = () => {
             status={metrics.temperature > 45 ? "Warning" : "Normal"}
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" stroke="currentColor" strokeWidth="2"/>
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" stroke="currentColor" strokeWidth="2" />
               </svg>
             }
           />
@@ -625,8 +656,8 @@ const Dashboard = () => {
                 : "Warning"}
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" stroke="currentColor" strokeWidth="2"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" stroke="currentColor" strokeWidth="2" />
               </svg>
             }
           />
@@ -638,7 +669,19 @@ const Dashboard = () => {
             status={metrics.voltage < 209 || metrics.voltage > 231 ? "Warning" : "Stable"}
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z" stroke="currentColor" strokeWidth="2"/>
+                <path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            }
+          />
+          <MetricCard
+            title="Current"
+            value={formatValue("current", metrics.current)}
+            iconColor="purple"
+            range="0-30A"
+            status={getCurrentStatus(metrics.current)}
+            icon={
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M13 3v10h4l-5 5v-10H7l5-5z" stroke="currentColor" strokeWidth="2" />
               </svg>
             }
           />
@@ -650,8 +693,8 @@ const Dashboard = () => {
             status={getKwhStatus(metrics.kwh)}
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z" stroke="currentColor" strokeWidth="2"/>
-                <path d="M8 1v4m8-4v4" stroke="currentColor" strokeWidth="2"/>
+                <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z" stroke="currentColor" strokeWidth="2" />
+                <path d="M8 1v4m8-4v4" stroke="currentColor" strokeWidth="2" />
               </svg>
             }
           />
@@ -681,19 +724,25 @@ const Dashboard = () => {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="glass rounded-xl p-6">
             <h3 className="text-lg font-semibold mb-4">Temperature & RPM</h3>
             <Line data={tempRpmChart} options={chartOptions} />
           </div>
           <div className="glass rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Voltage & Power Output</h3>
-            <Line data={voltagePowerChart} options={chartOptions} />
+            <h3 className="text-lg font-semibold mb-4">Voltage & Current</h3>
+            <Line data={voltageCurrentChart} options={chartOptions} />
           </div>
         </div>
 
+        {/* Power Chart - Full width */}
+        <div className="glass rounded-xl p-6 mb-8">
+          <h3 className="text-lg font-semibold mb-4">Power Output (kWh)</h3>
+          <Line data={powerChart} options={chartOptions} />
+        </div>
+
         {/* System Status */}
-        <div className="mt-8 glass rounded-xl p-6">
+        <div className="glass rounded-xl p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">System Status</h3>
             {systemStatus.lastUpdate && (
@@ -752,11 +801,11 @@ const Dashboard = () => {
 const MetricCard = ({ title, value, iconColor, range, status, icon }) => {
   // Determine status color based on status text
   const getStatusColor = (status) => {
-    if (status.includes("Warning")) return "text-red-400";
-    if (status.includes("No Usage")) return "text-yellow-400";
-    if (status.includes("Low Usage")) return "text-green-400";
-    if (status.includes("Normal Usage")) return "text-green-400";
-    if (status.includes("High Usage")) return "text-orange-400";
+    if (status.includes("Warning") || status.includes("Overload")) return "text-red-400";
+    if (status.includes("No Usage") || status.includes("No Load")) return "text-yellow-400";
+    if (status.includes("Low Usage") || status.includes("Low Load")) return "text-green-400";
+    if (status.includes("Normal Usage") || status.includes("Normal Load")) return "text-green-400";
+    if (status.includes("High Usage") || status.includes("High Load")) return "text-orange-400";
     if (status.includes("Normal")) return "text-green-400";
     if (status.includes("Optimal")) return "text-green-400";
     if (status.includes("Stable")) return "text-green-400";
