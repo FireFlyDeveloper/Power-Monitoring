@@ -701,25 +701,27 @@ const Dashboard = () => {
         </div>
 
         {/* Date Selector */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <h2 className="text-xl font-semibold">Historical Data</h2>
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
             <span className="text-sm text-teal-100/80">View data for:</span>
-            <input
-              type="date"
-              value={selectedDate.toISOString().split('T')[0]}
-              onChange={(e) => setSelectedDate(new Date(e.target.value))}
-              className="bg-slate-800/50 border border-teal-500/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            <div className="text-sm text-teal-100/60">
-              {formatDateDisplay(selectedDate)}
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <input
+                type="date"
+                value={selectedDate.toISOString().split('T')[0]}
+                onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                className="bg-slate-800/50 border border-teal-500/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 w-full sm:w-auto"
+              />
+              <div className="text-sm text-teal-100/60 self-center">
+                {formatDateDisplay(selectedDate)}
+              </div>
+              <button
+                onClick={() => setSelectedDate(new Date())}
+                className="px-3 py-2 text-sm rounded-lg bg-cyan-600 hover:bg-cyan-500 transition-colors whitespace-nowrap w-full sm:w-auto"
+              >
+                Today
+              </button>
             </div>
-            <button
-              onClick={() => setSelectedDate(new Date())}
-              className="px-3 py-2 text-sm rounded-lg bg-cyan-600 hover:bg-cyan-500 transition-colors"
-            >
-              Today
-            </button>
           </div>
         </div>
 
