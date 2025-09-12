@@ -25,7 +25,7 @@ const Navbar = () => {
           </div>
           <div>
             <h1 className="text-xl font-bold">Green Energy Monitor</h1>
-            <p className="text-xs text-teal-100/70">Sensor Data Monitoring</p>
+            <p className="text-xs text-teal-100/70">Advanced Sensor Data Analytics</p>
           </div>
         </div>
         <button
@@ -53,11 +53,10 @@ const Hero = () => {
     <section className="relative z-10 px-6 py-16 text-center">
       <div className="max-w-4xl mx-auto fade-in">
         <h2 className="text-4xl md:text-6xl font-extrabold mb-6 bg-gradient-to-r from-cyan-300 to-emerald-300 bg-clip-text text-transparent">
-          Real-time Green Energy Monitoring
+          Intelligent Green Energy Analytics
         </h2>
         <p className="text-xl md:text-2xl text-teal-100/80 mb-8 max-w-2xl mx-auto">
-          Track consumption, voltage, current, turbine speed, and temperature with live sensor data
-          monitoring.
+          Monitor energy systems with AI-powered insights, automated reporting, and comprehensive data exports.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
@@ -70,7 +69,7 @@ const Hero = () => {
             onClick={scrollToFeatures}
             className="glass px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/20 transition-all"
           >
-            Learn More
+            Explore Features
           </button>
         </div>
       </div>
@@ -97,9 +96,9 @@ const Features = () => {
     <section id="features" className="relative z-10 px-6 py-16">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h3 className="text-3xl md:text-4xl font-bold mb-4">Comprehensive Sensor Monitoring</h3>
+          <h3 className="text-3xl md:text-4xl font-bold mb-4">Advanced Energy Monitoring Features</h3>
           <p className="text-teal-100/70 text-lg max-w-2xl mx-auto">
-            Real-time monitoring of consumption, voltage, current, turbine speed, and temperature sensors.
+            Comprehensive monitoring with AI-powered analytics and data export capabilities.
           </p>
         </div>
 
@@ -135,8 +134,8 @@ const Features = () => {
                 <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" className="text-yellow-400" strokeWidth="2" />
               </svg>
             }
-            title="Current Monitoring"
-            description="Track electrical current flow with real-time monitoring and load status indicators."
+            title="AI-Powered Reports"
+            description="Generate comprehensive energy reports with AI analysis and download in multiple formats."
           />
           <FeatureCard
             iconBg="bg-red-500/20"
@@ -145,8 +144,8 @@ const Features = () => {
                 <path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z" stroke="currentColor" className="text-red-400" strokeWidth="2" />
               </svg>
             }
-            title="Local Standards"
-            description="Configured for Philippine electrical standards with 220V monitoring and local compliance."
+            title="Data Export"
+            description="Download raw sensor data in JSON format for further analysis or integration with other systems."
           />
           <FeatureCard
             iconBg="bg-purple-500/20"
