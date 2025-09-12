@@ -44,6 +44,7 @@ const Dashboard = () => {
   // Add state for selected date
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadingJson, setIsDownloadingJson] = useState(false);
 
   const [changePasswordData, setChangePasswordData] = useState({
     currentPassword: "",
@@ -343,12 +344,59 @@ const Dashboard = () => {
           }
         };
 
-        pdfMake.createPdf(docDefinition).download();
+        pdfMake.createPdf(docDefinition).download(`energy-report-${month}_${year}.pdf`);
       }
     } catch (error) {
       console.error("Error downloading report:", error);
+      alert('Failed to download report. Please try again.');
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const downloadJsonData = async () => {
+    setIsDownloadingJson(true);
+    try {
+      const month = selectedDate.toLocaleString('default', { month: 'long' }).toLowerCase();
+      const year = selectedDate.getFullYear();
+
+      const response = await fetch("/api/report/raw", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          month: month,
+          year: year
+        }),
+      });
+
+      if (response.status === 404) {
+        alert("No data to report");
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        const jsonString = JSON.stringify(data.data, null, 2);
+
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.href = url;
+        link.download = `energy-data-${month}_${year}.json`;
+
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Error downloading JSON:', error);
+      alert('Failed to download data. Please try again.');
+    } finally {
+      setIsDownloadingJson(false);
     }
   };
 
@@ -542,6 +590,29 @@ const Dashboard = () => {
                 {systemStatus.gridConnection ? 'System Online' : 'System Offline'}
               </span>
             </div>
+
+            <button
+              onClick={downloadJsonData}
+              disabled={isDownloadingJson}
+              className="flex items-center space-x-1 px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isDownloadingJson ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span className="text-sm">Preparing...</span>
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm">Download JSON</span>
+                </>
+              )}
+            </button>
 
             {/* Download Report Button */}
             <button
