@@ -135,7 +135,7 @@ const Features = () => {
               </svg>
             }
             title="AI-Powered Reports"
-            description="Generate comprehensive energy reports with AI analysis and download in multiple formats."
+            description="Generate comprehensive energy reports with AI analysis and download in PDF format."
           />
           <FeatureCard
             iconBg="bg-red-500/20"
