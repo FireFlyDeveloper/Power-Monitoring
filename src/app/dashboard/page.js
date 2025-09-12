@@ -571,7 +571,7 @@ const Dashboard = () => {
 
       <div className="relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
           <div className="flex items-center space-x-4">
             <div className="inline-flex items-center justify-center w-12 h-12 glass rounded-xl animate-pulse">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -583,101 +583,102 @@ const Dashboard = () => {
               <p className="text-teal-100/70">Real-time sensor monitoring</p>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+            <div className="flex items-center space-x-2 mb-3 sm:mb-0">
               <div className={`w-3 h-3 ${systemStatus.gridConnection ? 'bg-green-400' : 'bg-red-400'} rounded-full animate-pulse`}></div>
               <span className="text-sm text-teal-100/80">
                 {systemStatus.gridConnection ? 'System Online' : 'System Offline'}
               </span>
             </div>
 
-            <button
-              onClick={downloadJsonData}
-              disabled={isDownloadingJson}
-              className="flex items-center space-x-1 px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isDownloadingJson ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span className="text-sm">Preparing...</span>
-                </>
-              ) : (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-sm">Download JSON</span>
-                </>
-              )}
-            </button>
-
-            {/* Download Report Button */}
-            <button
-              onClick={downloadReport}
-              disabled={isDownloading}
-              className="flex items-center space-x-1 px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isDownloading ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span className="text-sm">Generating...</span>
-                </>
-              ) : (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-sm">Download Report</span>
-                </>
-              )}
-            </button>
-
-            {/* Profile Icon */}
-            <div className="relative" ref={profileRef}>
+            <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => setShowProfilePopup(!showProfilePopup)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-600 hover:bg-cyan-500 transition-colors"
+                onClick={downloadJsonData}
+                disabled={isDownloadingJson}
+                className="flex items-center space-x-1 px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-1 sm:flex-none justify-center"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+                {isDownloadingJson ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-sm">Preparing...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">JSON</span>
+                  </>
+                )}
               </button>
 
-              {/* Profile Popup */}
-              {showProfilePopup && (
-                <div className="absolute right-0 mt-2 w-48 glass rounded-lg shadow-lg py-1 z-50">
-                  <div className="px-4 py-2 border-b border-teal-500/20">
-                    <p className="text-sm font-medium">Admin User</p>
-                    <p className="text-xs text-teal-100/60">System Administrator</p>
+              <button
+                onClick={downloadReport}
+                disabled={isDownloading}
+                className="flex items-center space-x-1 px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-1 sm:flex-none justify-center"
+              >
+                {isDownloading ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-sm">Generating...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Report</span>
+                  </>
+                )}
+              </button>
+
+              <div className="relative" ref={profileRef}>
+                <button
+                  onClick={() => setShowProfilePopup(!showProfilePopup)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-600 hover:bg-cyan-500 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </button>
+
+                {/* Profile Popup */}
+                {showProfilePopup && (
+                  <div className="absolute right-0 mt-2 w-48 glass rounded-lg shadow-lg py-1 z-50">
+                    <div className="px-4 py-2 border-b border-teal-500/20">
+                      <p className="text-sm font-medium">Admin User</p>
+                      <p className="text-xs text-teal-100/60">System Administrator</p>
+                    </div>
+
+                    <button
+                      className="block w-full text-left px-4 py-2 text-sm hover:bg-teal-700/30 transition-colors profile-option"
+                      onClick={() => {
+                        setShowChangePassword(true);
+                        setShowProfilePopup(false);
+                      }}
+                    >
+                      Change Password
+                    </button>
+
+                    <button
+                      className="block w-full text-left px-4 py-2 text-sm hover:bg-teal-700/30 transition-colors"
+                      onClick={() => {
+                        signOut();
+                        setShowProfilePopup(false);
+                      }}
+                    >
+                      Sign Out
+                    </button>
                   </div>
-
-                  <button
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-teal-700/30 transition-colors profile-option"
-                    onClick={() => {
-                      setShowChangePassword(true);
-                      setShowProfilePopup(false);
-                    }}
-                  >
-                    Change Password
-                  </button>
-
-                  <button
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-teal-700/30 transition-colors"
-                    onClick={() => {
-                      signOut();
-                      setShowProfilePopup(false);
-                    }}
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
