@@ -15,6 +15,10 @@ import {
 } from "chart.js";
 import 'chartjs-adapter-date-fns';
 import { useAuth } from "../../utils/auth";
+import markdownit from 'markdown-it'
+import pdfMake from "pdfmake/build/pdfmake";
+import "pdfmake/build/vfs_fonts";
+import htmlToPdfmake from 'html-to-pdfmake';
 
 ChartJS.register(
   CategoryScale,
@@ -26,6 +30,8 @@ ChartJS.register(
   Legend,
   TimeScale
 );
+
+const md = markdownit()
 
 const Dashboard = () => {
   const ws = useRef(null);
@@ -303,6 +309,38 @@ const Dashboard = () => {
     return Object.keys(errors).length === 0;
   };
 
+  const downloadReport = async () => {
+    try {
+      const response = await fetch("/api/report/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          month: "september",
+          year: 2025
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const html = md.render(data.report);
+        const pdfContent = htmlToPdfmake(html);
+        
+        const docDefinition = { 
+          content: pdfContent,
+          defaultStyle: {
+            fontSize: 11
+          }
+        };
+        
+        pdfMake.createPdf(docDefinition).download();
+      }
+    } catch (error) {
+      console.error("Error downloading report:", error);
+    }
+  };
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
 
@@ -493,6 +531,17 @@ const Dashboard = () => {
                 {systemStatus.gridConnection ? 'System Online' : 'System Offline'}
               </span>
             </div>
+
+            {/* Download Report Button */}
+            <button
+              onClick={downloadReport}
+              className="flex items-center space-x-1 px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm">Download Report</span>
+            </button>
 
             {/* Profile Icon */}
             <div className="relative" ref={profileRef}>
