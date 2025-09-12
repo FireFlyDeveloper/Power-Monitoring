@@ -313,16 +313,23 @@ const Dashboard = () => {
   const downloadReport = async () => {
     setIsDownloading(true);
     try {
+      const month = selectedDate.toLocaleString('default', { month: 'long' }).toLowerCase();
+      const year = selectedDate.getFullYear();
+
       const response = await fetch("/api/report/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          month: "september",
-          year: 2025
+          month: month,
+          year: year
         }),
       });
+
+      if (response.status === 404) {
+        alert("No data to report");
+      }
 
       if (response.ok) {
         const data = await response.json();
