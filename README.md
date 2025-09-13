@@ -1,40 +1,42 @@
-# 🌱 Green Energy Monitor Dashboard
+# 🌱 Green Energy Monitor
 
 ![Dashboard Preview](https://github.com/FireFlyDeveloper/Power-Monitoring/blob/main/public/image.png)  
-_A modern real-time energy monitoring dashboard built with Next.js, WebSockets, and Chart.js._
+_A modern green energy monitoring and analytics platform with real-time data, AI-powered insights, and advanced export options._
 
 ----------
 
 ## ✨ Features
 
--   📊 **Real-Time Monitoring**
+-   📊 **Real-Time Sensor Data**  
+    Monitor temperature, turbine speed (RPM), voltage, current, and energy consumption with live updates.
     
-    -   Temperature, RPM, Voltage, and Energy Usage.
-            
--   ⚡ **Live WebSocket Updates**
+-   📈 **Historical Trends**  
+    Interactive 24-hour charts to analyze performance and system behavior over time.
     
-    -   Automatic reconnection.
-        
-    -   Real-time system status and alerts.
-        
--   📈 **Interactive Charts**
+-   🤖 **AI-Powered Reports**  
+    Generate comprehensive energy reports with AI insights and export to PDF.
     
-    -   Dual-axis Chart.js graphs for Temperature/RPM and Voltage/Power Usage.
-        
-    -   Historical data filter by date.
-        
--   🔐 **Authentication & Profile**
+-   📥 **Data Export**  
+    Download raw sensor data in JSON format for integration or offline analysis.
     
-    -   Secure password change popup.
-        
-    -   Sign-out option with graceful handling.
-        
--   🎨 **Modern UI**
+-   ⚡ **Current Analysis**  
+    Detailed current tracking with load indicators for performance optimization.
     
-    -   TailwindCSS + glassmorphism.
-        
-    -   Smooth floating background animations.
-        
+-   🔄 **Consumption Tracking**  
+    Monitor energy usage patterns and turbine operational efficiency.
+    
+-   🌪️ **Turbine Performance**  
+    Track RPM and efficiency of your turbines in real-time.
+    
+-   🌡️ **Temperature Monitoring**  
+    Prevent overheating with live system temperature tracking.
+    
+-   📱 **Mobile Ready**  
+    Fully responsive design — works seamlessly on desktop, tablet, and mobile.
+    
+-   🎨 **Modern UI**  
+    TailwindCSS + glassmorphism with smooth floating background animations.
+    
 
 ----------
 
@@ -56,7 +58,7 @@ npm run dev
 
 ```
 
-Dashboard will be available at 👉 [http://localhost:3000](http://localhost:3000/)
+App will be available at 👉 [http://localhost:3000](http://localhost:3000/)
 
 ----------
 
@@ -66,6 +68,4 @@ Dashboard will be available at 👉 [http://localhost:3000](http://localhost:300
     
 -   **Charts:** Chart.js + chartjs-adapter-date-fns
     
--    **Backend:** [Power-Monitoring-Backend](https://github.com/FireFlyDeveloper/Power-Monitoring-Backend.git)
-    
-----------
+-   **Backend:** [Power-Monitoring-Backend](https://github.com/FireFlyDeveloper/Power-Monitoring-Backend.git)
