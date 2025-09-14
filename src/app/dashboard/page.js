@@ -345,6 +345,8 @@ const Dashboard = () => {
         };
 
         pdfMake.createPdf(docDefinition).download(`energy-report-${month}_${year}.pdf`);
+      } else {
+        alert("Something went wrong. Please try again.");
       }
     } catch (error) {
       console.error("Error downloading report:", error);
@@ -391,6 +393,8 @@ const Dashboard = () => {
 
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
+      } else {
+        alert("Something went wrong. Please try again.");
       }
     } catch (error) {
       console.error('Error downloading JSON:', error);
