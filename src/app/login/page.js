@@ -3,8 +3,10 @@
 import React, { useState } from "react";
 import "../globals.css";
 import { useAuth } from "../../utils/auth";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const router = useRouter();
   const { signIn } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -40,10 +42,10 @@ export default function Login() {
       }
 
       const data = await response.json();
-
-      if (signIn({ token: data.token, authUserState: data.authUserState })) {
-        alert("Sign in Authorized");
-        window.location.href = "/dashboard";
+      
+      const success = await signIn({ token: data.token, authUserState: data.authUserState });
+      if (success) {
+        router.push("/dashboard");
       } else {
         setError("Login failed. Please try again.");
       }
