@@ -16,6 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Green Energy",
   description: "Green Energy",
+  icons: {
+    icon: "/energy.ico",
+    shortcut: "/energy.ico",
+  },
 };
 
 export default function RootLayout({ children }) {
