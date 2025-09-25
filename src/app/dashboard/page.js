@@ -111,6 +111,8 @@ const Dashboard = () => {
   // Connect to WebSocket
   useEffect(() => {
     let reconnectTimeout;
+    let healthCheckInterval;
+    let lastUpdateTime = Date.now();
 
     const connectWebSocket = async () => {
       const token = await fetch("/api/auth/get", { method: 'POST' });
@@ -122,12 +124,14 @@ const Dashboard = () => {
 
       ws.current.onopen = () => {
         console.log("WebSocket connected");
-        requestHistory(); // request initial history
-        requestSystemStatus(); // request system status
+        requestHistory();
       };
 
       ws.current.onmessage = (event) => {
         const message = JSON.parse(event.data);
+
+        // Mark last update received
+        lastUpdateTime = Date.now();
 
         if (message.data?.action === "update") {
           setMetrics((prev) => ({ ...prev, ...message.data.data }));
@@ -139,7 +143,7 @@ const Dashboard = () => {
             rpm: message.data.rpm,
             voltage: message.data.voltage,
             kwh: message.data.kwh,
-            current: message.data.current || 0, // Handle current data
+            current: message.data.current || 0,
           });
         }
 
@@ -174,35 +178,11 @@ const Dashboard = () => {
             current: currentData,
           });
         }
-
-        // Handle system status updates
-        if (message.action === "systemStatus") {
-          setSystemStatus({
-            turbineOperational: message.data.turbine_operational,
-            gridConnection: message.data.grid_connection_stable,
-            sensorsActive: message.data.all_sensors_active,
-            lastUpdate: new Date(message.data.timestamp),
-            alerts: message.data.alerts || []
-          });
-        }
-
-        // Handle alerts
-        if (message.action === "alert") {
-          setSystemStatus(prev => ({
-            ...prev,
-            alerts: [...prev.alerts, {
-              id: message.data.id,
-              message: message.data.message,
-              severity: message.data.severity,
-              timestamp: new Date(message.data.timestamp)
-            }]
-          }));
-        }
       };
 
       ws.current.onclose = () => {
         console.log("WebSocket disconnected, reconnecting in 5s...");
-        reconnectTimeout = setTimeout(connectWebSocket, 5000); // reconnect after 5s
+        reconnectTimeout = setTimeout(connectWebSocket, 5000);
       };
 
       ws.current.onerror = (err) => {
@@ -213,7 +193,27 @@ const Dashboard = () => {
 
     connectWebSocket();
 
-    return () => clearTimeout(reconnectTimeout);
+    healthCheckInterval = setInterval(() => {
+      const now = Date.now();
+      if (now - lastUpdateTime > 15000) {
+        setSystemStatus(prev => ({
+          ...prev,
+          isDown: true,
+          lastUpdate: new Date(lastUpdateTime),
+        }));
+      } else {
+        setSystemStatus(prev => ({
+          ...prev,
+          isDown: false,
+          lastUpdate: new Date(lastUpdateTime),
+        }));
+      }
+    }, 10000);
+
+    return () => {
+      clearTimeout(reconnectTimeout);
+      clearInterval(healthCheckInterval);
+    };
   }, []);
 
   // Request history when selected date changes
@@ -815,7 +815,7 @@ const Dashboard = () => {
             value={formatValue("voltage", metrics.voltage)}
             iconColor="yellow"
             range="220V ±5%"
-            status={metrics.voltage < 209 || metrics.voltage > 231 ? "Warning" : "Stable"}
+            status={metrics.voltage < 209 || metrics.voltage > 241 ? "Warning" : "Stable"}
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z" stroke="currentColor" strokeWidth="2" />
