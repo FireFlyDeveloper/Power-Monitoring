@@ -178,10 +178,10 @@ const Dashboard = () => {
         // Handle system status updates
         if (message.action === "systemStatus") {
           setSystemStatus({
-            turbineOperational: message.data.turbine_operational,
-            gridConnection: message.data.grid_connection_stable,
-            sensorsActive: message.data.all_sensors_active,
-            lastUpdate: new Date(message.data.timestamp),
+            turbineOperational: message.data.turbineOperational,
+            gridConnection: message.data.gridConnection,
+            sensorsActive: message.data.sensorsActive,
+            lastUpdate: new Date(message.data.lastUpdate),
             alerts: message.data.alerts || []
           });
         }
