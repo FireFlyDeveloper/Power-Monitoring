@@ -187,17 +187,17 @@ const Dashboard = () => {
         }
 
         // Handle alerts
-        if (message.action === "alert") {
-          setSystemStatus(prev => ({
-            ...prev,
-            alerts: [...prev.alerts, {
-              id: message.data.id,
-              message: message.data.message,
-              severity: message.data.severity,
-              timestamp: new Date(message.data.timestamp)
-            }]
-          }));
-        }
+        // if (message.action === "alert") {
+        //   setSystemStatus(prev => ({
+        //     ...prev,
+        //     alerts: [...prev.alerts, {
+        //       id: message.data.id,
+        //       message: message.data.message,
+        //       severity: message.data.severity,
+        //       timestamp: new Date(message.data.timestamp)
+        //     }]
+        //   }));
+        // }
       };
 
       ws.current.onclose = () => {
