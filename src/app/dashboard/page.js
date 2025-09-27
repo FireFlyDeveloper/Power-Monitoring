@@ -182,7 +182,7 @@ const Dashboard = () => {
             gridConnection: message.data.gridConnection,
             sensorsActive: message.data.sensorsActive,
             lastUpdate: new Date(message.data.lastUpdate),
-            alerts: message.data.alerts || []
+            alerts: []
           });
         }
 
