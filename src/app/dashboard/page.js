@@ -541,7 +541,7 @@ const Dashboard = () => {
     },
   };
 
-  const tempRpmChart = {
+  const tempChart = {
     labels: chartData.labels,
     datasets: [
       {
@@ -551,6 +551,12 @@ const Dashboard = () => {
         backgroundColor: "rgba(239, 68, 68, 0.1)",
         yAxisID: "y",
       },
+    ],
+  };
+
+  const rpmChart = {
+    labels: chartData.labels,
+    datasets: [
       {
         label: "RPM",
         data: chartData.rpm,
@@ -561,7 +567,7 @@ const Dashboard = () => {
     ],
   };
 
-  const voltageCurrentChart = {
+  const voltageChart = {
     labels: chartData.labels,
     datasets: [
       {
@@ -571,6 +577,12 @@ const Dashboard = () => {
         backgroundColor: "rgba(234, 179, 8, 0.1)",
         yAxisID: "y",
       },
+    ],
+  };
+
+  const currentChart = {
+    labels: chartData.labels,
+    datasets: [
       {
         label: "Current (A)",
         data: chartData.current,
@@ -773,7 +785,7 @@ const Dashboard = () => {
 
                 {/* Profile Popup */}
                 {showProfilePopup && (
-                  <div className="absolute right-0 mt-2 w-48 glass rounded-lg shadow-lg py-1 z-50">
+                  <div className="absolute right-0 mt-2 w-48 glass rounded-lg shadow-lg py-1 z-50 bg-black/50 backdrop-blur">
                     <div className="px-4 py-2 border-b border-teal-500/20">
                       <p className="text-sm font-medium">Admin User</p>
                       <p className="text-xs text-teal-100/60">
@@ -1054,21 +1066,27 @@ const Dashboard = () => {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div className="glass rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Temperature & RPM</h3>
-            <Line data={tempRpmChart} options={chartOptions} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="glass rounded-xl p-6 bg-white/10">
+            <h3 className="text-lg font-semibold mb-4">Temperature</h3>
+            <Line data={tempChart} options={chartOptions} />
           </div>
-          <div className="glass rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Voltage & Current</h3>
-            <Line data={voltageCurrentChart} options={chartOptions} />
+          <div className="glass rounded-xl p-6 bg-white/10">
+            <h3 className="text-lg font-semibold mb-4">RPM</h3>
+            <Line data={rpmChart} options={chartOptions} />
           </div>
-        </div>
-
-        {/* Power Chart - Full width */}
-        <div className="glass rounded-xl p-6 mb-8">
-          <h3 className="text-lg font-semibold mb-4">Power Output (kWh)</h3>
-          <Line data={powerChart} options={chartOptions} />
+          <div className="glass rounded-xl p-6 bg-white/10">
+            <h3 className="text-lg font-semibold mb-4">Voltage</h3>
+            <Line data={voltageChart} options={chartOptions} />
+          </div>
+          <div className="glass rounded-xl p-6 bg-white/10">
+            <h3 className="text-lg font-semibold mb-4">Current</h3>
+            <Line data={currentChart} options={chartOptions} />
+          </div>
+          <div className="glass rounded-xl p-6 bg-white/10">
+            <h3 className="text-lg font-semibold mb-4">Power Output (kWh)</h3>
+            <Line data={powerChart} options={chartOptions} />
+          </div>
         </div>
 
         {/* System Status */}
@@ -1165,7 +1183,7 @@ const MetricCard = ({ title, value, iconColor, range, status, icon }) => {
   };
 
   return (
-    <div className="glass rounded-xl p-6 metric-card">
+    <div className="glass rounded-xl p-6 metric-card bg-white/10">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
           <div
