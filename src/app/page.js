@@ -32,7 +32,7 @@ const Navbar = () => {
         </div>
         <button
           onClick={goToDashboard}
-          className="btn-primary px-6 py-2 rounded-lg font-medium"
+          className="btn-primary px-6 py-2 rounded-lg font-medium bg-blue-500"
         >
           View Dashboard
         </button>
@@ -64,13 +64,13 @@ const Hero = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={goToDashboard}
-            className="btn-primary px-8 py-4 rounded-xl font-semibold text-lg"
+            className="btn-primary px-8 py-4 rounded-xl font-semibold text-lg bg-blue-500"
           >
             Launch Dashboard
           </button>
           <button
             onClick={scrollToFeatures}
-            className="glass px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/20 transition-all"
+            className="glass px-8 py-4 rounded-xl font-semibold text-lg bg-white/10 hover:bg-white/20 transition-all"
           >
             Explore Features
           </button>
@@ -83,7 +83,7 @@ const Hero = () => {
 // Feature Card Component
 const FeatureCard = ({ iconBg, icon, title, description }) => {
   return (
-    <div className="glass rounded-xl p-8 feature-card hover:translate-y-[-5px] transition-all">
+    <div className="glass rounded-xl p-8 feature-card hover:translate-y-[-5px] transition-all bg-white/10">
       <div
         className={`w-12 h-12 ${iconBg} rounded-lg flex items-center justify-center mb-4`}
       >
