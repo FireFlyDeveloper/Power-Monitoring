@@ -63,7 +63,9 @@ export default function Login() {
         "An error occurred while trying to log in. Please try again later.",
       );
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
     }
   };
 
@@ -246,8 +248,8 @@ export default function Login() {
             {/* Submit */}
             <button
               type="submit"
-              disabled={loading || !username || !password}
-              className="btn btn-primary w-full py-3 px-4 rounded-xl text-base font-semibold disabled:opacity-70 disabled:cursor-not-allowed transition-opacity"
+              disabled={loading || !username.trim() || !password.trim()}
+              className="btn btn-primary w-full py-3 px-4 rounded-xl text-base font-semibold disabled:opacity-70 disabled:cursor-not-allowed transition-opacity bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 text-white"
             >
               {loading ? (
                 <span className="flex items-center justify-center">
