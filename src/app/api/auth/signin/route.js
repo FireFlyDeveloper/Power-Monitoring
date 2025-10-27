@@ -11,10 +11,16 @@ export async function POST(request) {
     const expires = new Date(Date.now() + 3600 * 1000);
     const cookie = await cookies();
     cookie.set("session", token, { expires, httpOnly: true });
-    cookie.set("authUserState", JSON.stringify(authUserState), { expires, httpOnly: true });
+    cookie.set("authUserState", JSON.stringify(authUserState), {
+      expires,
+      httpOnly: true,
+    });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error setting cookies:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

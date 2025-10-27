@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Line } from "react-chartjs-2";
@@ -13,12 +13,12 @@ import {
   Legend,
   TimeScale,
 } from "chart.js";
-import 'chartjs-adapter-date-fns';
+import "chartjs-adapter-date-fns";
 import { useAuth } from "../../utils/auth";
-import markdownit from 'markdown-it'
+import markdownit from "markdown-it";
 import pdfMake from "pdfmake/build/pdfmake";
 import "pdfmake/build/vfs_fonts";
-import htmlToPdfmake from 'html-to-pdfmake';
+import htmlToPdfmake from "html-to-pdfmake";
 
 ChartJS.register(
   CategoryScale,
@@ -28,10 +28,10 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  TimeScale
+  TimeScale,
 );
 
-const md = markdownit()
+const md = markdownit();
 
 const Dashboard = () => {
   const ws = useRef(null);
@@ -49,7 +49,7 @@ const Dashboard = () => {
   const [changePasswordData, setChangePasswordData] = useState({
     currentPassword: "",
     newPassword: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
   const [changePasswordErrors, setChangePasswordErrors] = useState({});
@@ -81,7 +81,7 @@ const Dashboard = () => {
     gridConnection: false,
     sensorsActive: false,
     lastUpdate: null,
-    alerts: []
+    alerts: [],
   });
 
   const isToday = () => {
@@ -103,7 +103,7 @@ const Dashboard = () => {
         action: "getHistory",
         start: start.toISOString(),
         end: end.toISOString(),
-      })
+      }),
     );
   }, [selectedDate]);
 
@@ -114,8 +114,11 @@ const Dashboard = () => {
         setShowProfilePopup(false);
       }
 
-      if (changePasswordRef.current && !changePasswordRef.current.contains(event.target) &&
-        !event.target.closest('.profile-option')) {
+      if (
+        changePasswordRef.current &&
+        !changePasswordRef.current.contains(event.target) &&
+        !event.target.closest(".profile-option")
+      ) {
         setShowChangePassword(false);
       }
     };
@@ -131,11 +134,11 @@ const Dashboard = () => {
     let reconnectTimeout;
 
     const connectWebSocket = async () => {
-      const token = await fetch("/api/auth/get", { method: 'POST' });
+      const token = await fetch("/api/auth/get", { method: "POST" });
       const session = await token.json();
 
       ws.current = new WebSocket(
-        `wss://power-monitoring-backend.onrender.com/ws/data?token=${encodeURIComponent(session.token)}`
+        `wss://power-monitoring-backend.onrender.com/ws/data?token=${encodeURIComponent(session.token)}`,
       );
 
       ws.current.onopen = () => {
@@ -166,21 +169,39 @@ const Dashboard = () => {
           const labels = history.map((d) => new Date(d.created_at));
           const temperatureData = history
             .filter((d) => d.sensor_type === "temperature")
-            .map((d) => ({ x: new Date(d.created_at), y: parseFloat(d.avg_value) }));
+            .map((d) => ({
+              x: new Date(d.created_at),
+              y: parseFloat(d.avg_value),
+            }));
           const rpmData = history
             .filter((d) => d.sensor_type === "rpm")
-            .map((d) => ({ x: new Date(d.created_at), y: parseFloat(d.avg_value) }));
+            .map((d) => ({
+              x: new Date(d.created_at),
+              y: parseFloat(d.avg_value),
+            }));
           const voltageData = history
             .filter((d) => d.sensor_type === "voltage")
-            .map((d) => ({ x: new Date(d.created_at), y: parseFloat(d.avg_value) }));
+            .map((d) => ({
+              x: new Date(d.created_at),
+              y: parseFloat(d.avg_value),
+            }));
           const kwhData = history
             .filter((d) => d.sensor_type === "kwh")
-            .map((d) => ({ x: new Date(d.created_at), y: parseFloat(d.avg_value) }));
+            .map((d) => ({
+              x: new Date(d.created_at),
+              y: parseFloat(d.avg_value),
+            }));
           const currentData = history
             .filter((d) => d.sensor_type === "current")
-            .map((d) => ({ x: new Date(d.created_at), y: parseFloat(d.avg_value) }));
+            .map((d) => ({
+              x: new Date(d.created_at),
+              y: parseFloat(d.avg_value),
+            }));
 
-          const totalKwh = kwhData.reduce((sum, dataPoint) => sum + dataPoint.y, 0);
+          const totalKwh = kwhData.reduce(
+            (sum, dataPoint) => sum + dataPoint.y,
+            0,
+          );
           setTodayKwh(totalKwh);
 
           setChartData({
@@ -200,7 +221,7 @@ const Dashboard = () => {
             gridConnection: message.data.gridConnection,
             sensorsActive: message.data.sensorsActive,
             lastUpdate: new Date(message.data.lastUpdate),
-            alerts: []
+            alerts: [],
           });
         }
 
@@ -250,8 +271,8 @@ const Dashboard = () => {
 
     ws.current.send(
       JSON.stringify({
-        action: "getSystemStatus"
-      })
+        action: "getSystemStatus",
+      }),
     );
   };
 
@@ -261,29 +282,29 @@ const Dashboard = () => {
     ws.current.send(
       JSON.stringify({
         action: "acknowledgeAlert",
-        alertId: alertId
-      })
+        alertId: alertId,
+      }),
     );
 
     // Remove the acknowledged alert from local state
-    setSystemStatus(prev => ({
+    setSystemStatus((prev) => ({
       ...prev,
-      alerts: prev.alerts.filter(alert => alert.id !== alertId)
+      alerts: prev.alerts.filter((alert) => alert.id !== alertId),
     }));
   };
 
   const handleChangePasswordInput = (e) => {
     const { name, value } = e.target;
-    setChangePasswordData(prev => ({
+    setChangePasswordData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Clear errors when typing
     if (changePasswordErrors[name]) {
-      setChangePasswordErrors(prev => ({
+      setChangePasswordErrors((prev) => ({
         ...prev,
-        [name]: ""
+        [name]: "",
       }));
     }
   };
@@ -303,7 +324,9 @@ const Dashboard = () => {
 
     if (!changePasswordData.confirmPassword) {
       errors.confirmPassword = "Please confirm your new password";
-    } else if (changePasswordData.newPassword !== changePasswordData.confirmPassword) {
+    } else if (
+      changePasswordData.newPassword !== changePasswordData.confirmPassword
+    ) {
       errors.confirmPassword = "Passwords do not match";
     }
 
@@ -314,7 +337,9 @@ const Dashboard = () => {
   const downloadReport = async () => {
     setIsDownloading(true);
     try {
-      const month = selectedDate.toLocaleString('default', { month: 'long' }).toLowerCase();
+      const month = selectedDate
+        .toLocaleString("default", { month: "long" })
+        .toLowerCase();
       const year = selectedDate.getFullYear();
 
       const response = await fetch("/api/report/generate", {
@@ -324,7 +349,7 @@ const Dashboard = () => {
         },
         body: JSON.stringify({
           month: month,
-          year: year
+          year: year,
         }),
       });
 
@@ -340,17 +365,19 @@ const Dashboard = () => {
         const docDefinition = {
           content: pdfContent,
           defaultStyle: {
-            fontSize: 11
-          }
+            fontSize: 11,
+          },
         };
 
-        pdfMake.createPdf(docDefinition).download(`energy-report-${month}_${year}.pdf`);
+        pdfMake
+          .createPdf(docDefinition)
+          .download(`energy-report-${month}_${year}.pdf`);
       } else {
         alert("Something went wrong. Please try again.");
       }
     } catch (error) {
       console.error("Error downloading report:", error);
-      alert('Failed to download report. Please try again.');
+      alert("Failed to download report. Please try again.");
     } finally {
       setIsDownloading(false);
     }
@@ -359,7 +386,9 @@ const Dashboard = () => {
   const downloadJsonData = async () => {
     setIsDownloadingJson(true);
     try {
-      const month = selectedDate.toLocaleString('default', { month: 'long' }).toLowerCase();
+      const month = selectedDate
+        .toLocaleString("default", { month: "long" })
+        .toLowerCase();
       const year = selectedDate.getFullYear();
 
       const response = await fetch("/api/report/raw", {
@@ -369,7 +398,7 @@ const Dashboard = () => {
         },
         body: JSON.stringify({
           month: month,
-          year: year
+          year: year,
         }),
       });
 
@@ -381,9 +410,9 @@ const Dashboard = () => {
         const data = await response.json();
         const jsonString = JSON.stringify(data.data, null, 2);
 
-        const blob = new Blob([jsonString], { type: 'application/json' });
+        const blob = new Blob([jsonString], { type: "application/json" });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
+        const link = document.createElement("a");
 
         link.href = url;
         link.download = `energy-data-${month}_${year}.json`;
@@ -397,8 +426,8 @@ const Dashboard = () => {
         alert("Something went wrong. Please try again.");
       }
     } catch (error) {
-      console.error('Error downloading JSON:', error);
-      alert('Failed to download data. Please try again.');
+      console.error("Error downloading JSON:", error);
+      alert("Failed to download data. Please try again.");
     } finally {
       setIsDownloadingJson(false);
     }
@@ -420,7 +449,7 @@ const Dashboard = () => {
         },
         body: JSON.stringify({
           currentPassword: changePasswordData.currentPassword,
-          newPassword: changePasswordData.newPassword
+          newPassword: changePasswordData.newPassword,
         }),
       });
 
@@ -431,7 +460,7 @@ const Dashboard = () => {
         setChangePasswordData({
           currentPassword: "",
           newPassword: "",
-          confirmPassword: ""
+          confirmPassword: "",
         });
 
         // Close the popup after a delay
@@ -486,17 +515,29 @@ const Dashboard = () => {
     plugins: { legend: { labels: { color: "white" } } },
     scales: {
       x: {
-        type: 'time',
+        type: "time",
         time: {
-          unit: 'hour',
-          tooltipFormat: 'HH:mm',
-          displayFormats: { hour: 'HH:mm' },
+          unit: "hour",
+          tooltipFormat: "HH:mm",
+          displayFormats: { hour: "HH:mm" },
         },
-        ticks: { color: 'white' },
-        grid: { color: 'rgba(255,255,255,0.1)' }
+        ticks: { color: "white" },
+        grid: { color: "rgba(255,255,255,0.1)" },
       },
-      y: { type: "linear", display: true, position: "left", ticks: { color: "white" }, grid: { color: "rgba(255,255,255,0.1)" } },
-      y1: { type: "linear", display: true, position: "right", ticks: { color: "white" }, grid: { drawOnChartArea: false } },
+      y: {
+        type: "linear",
+        display: true,
+        position: "left",
+        ticks: { color: "white" },
+        grid: { color: "rgba(255,255,255,0.1)" },
+      },
+      y1: {
+        type: "linear",
+        display: true,
+        position: "right",
+        ticks: { color: "white" },
+        grid: { drawOnChartArea: false },
+      },
     },
   };
 
@@ -556,11 +597,11 @@ const Dashboard = () => {
 
   // Format date for display
   const formatDateDisplay = (date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -569,8 +610,14 @@ const Dashboard = () => {
       {/* Floating background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-cyan-400/5 animate-float"></div>
-        <div className="absolute bottom-20 right-10 w-24 h-24 rounded-full bg-emerald-400/5 animate-float" style={{ animationDelay: "-2s" }}></div>
-        <div className="absolute top-1/2 left-1/4 w-16 h-16 rounded-full bg-teal-400/5 animate-float" style={{ animationDelay: "-4s" }}></div>
+        <div
+          className="absolute bottom-20 right-10 w-24 h-24 rounded-full bg-emerald-400/5 animate-float"
+          style={{ animationDelay: "-2s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/4 w-16 h-16 rounded-full bg-teal-400/5 animate-float"
+          style={{ animationDelay: "-4s" }}
+        ></div>
       </div>
 
       <div className="relative z-10">
@@ -579,7 +626,13 @@ const Dashboard = () => {
           <div className="flex items-center space-x-4">
             <div className="inline-flex items-center justify-center w-12 h-12 glass rounded-xl animate-pulse">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z" stroke="currentColor" className="text-cyan-300" strokeWidth="2" strokeLinejoin="round" />
+                <path
+                  d="M13 3L4 14h7l-1 7 9-11h-7l1-7z"
+                  stroke="currentColor"
+                  className="text-cyan-300"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
               </svg>
             </div>
             <div>
@@ -590,9 +643,13 @@ const Dashboard = () => {
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
             <div className="flex items-center space-x-2 mb-3 sm:mb-0">
-              <div className={`w-3 h-3 ${systemStatus.gridConnection ? 'bg-green-400' : 'bg-red-400'} rounded-full animate-pulse`}></div>
+              <div
+                className={`w-3 h-3 ${systemStatus.gridConnection ? "bg-green-400" : "bg-red-400"} rounded-full animate-pulse`}
+              ></div>
               <span className="text-sm text-teal-100/80">
-                {systemStatus.gridConnection ? 'System Online' : 'System Offline'}
+                {systemStatus.gridConnection
+                  ? "System Online"
+                  : "System Offline"}
               </span>
             </div>
 
@@ -604,16 +661,41 @@ const Dashboard = () => {
               >
                 {isDownloadingJson ? (
                   <>
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     <span className="text-sm">Preparing...</span>
                   </>
                 ) : (
                   <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     <span className="text-sm">JSON</span>
                   </>
@@ -627,16 +709,41 @@ const Dashboard = () => {
               >
                 {isDownloading ? (
                   <>
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     <span className="text-sm">Generating...</span>
                   </>
                 ) : (
                   <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     <span className="text-sm">Report</span>
                   </>
@@ -648,8 +755,19 @@ const Dashboard = () => {
                   onClick={() => setShowProfilePopup(!showProfilePopup)}
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-600 hover:bg-cyan-500 transition-colors"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
                   </svg>
                 </button>
 
@@ -658,7 +776,9 @@ const Dashboard = () => {
                   <div className="absolute right-0 mt-2 w-48 glass rounded-lg shadow-lg py-1 z-50">
                     <div className="px-4 py-2 border-b border-teal-500/20">
                       <p className="text-sm font-medium">Admin User</p>
-                      <p className="text-xs text-teal-100/60">System Administrator</p>
+                      <p className="text-xs text-teal-100/60">
+                        System Administrator
+                      </p>
                     </div>
 
                     <button
@@ -700,15 +820,26 @@ const Dashboard = () => {
                   onClick={() => setShowChangePassword(false)}
                   className="text-teal-100/70 hover:text-white"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </button>
               </div>
 
               <form onSubmit={handleChangePassword} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Current Password</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Current Password
+                  </label>
                   <input
                     type="password"
                     name="currentPassword"
@@ -718,12 +849,16 @@ const Dashboard = () => {
                     placeholder="Enter current password"
                   />
                   {changePasswordErrors.currentPassword && (
-                    <p className="text-red-400 text-xs mt-1">{changePasswordErrors.currentPassword}</p>
+                    <p className="text-red-400 text-xs mt-1">
+                      {changePasswordErrors.currentPassword}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">New Password</label>
+                  <label className="block text-sm font-medium mb-1">
+                    New Password
+                  </label>
                   <input
                     type="password"
                     name="newPassword"
@@ -733,12 +868,16 @@ const Dashboard = () => {
                     placeholder="Enter new password"
                   />
                   {changePasswordErrors.newPassword && (
-                    <p className="text-red-400 text-xs mt-1">{changePasswordErrors.newPassword}</p>
+                    <p className="text-red-400 text-xs mt-1">
+                      {changePasswordErrors.newPassword}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Confirm New Password</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Confirm New Password
+                  </label>
                   <input
                     type="password"
                     name="confirmPassword"
@@ -748,12 +887,16 @@ const Dashboard = () => {
                     placeholder="Confirm new password"
                   />
                   {changePasswordErrors.confirmPassword && (
-                    <p className="text-red-400 text-xs mt-1">{changePasswordErrors.confirmPassword}</p>
+                    <p className="text-red-400 text-xs mt-1">
+                      {changePasswordErrors.confirmPassword}
+                    </p>
                   )}
                 </div>
 
                 {changePasswordMessage && (
-                  <p className={`text-sm ${changePasswordMessage.includes("successfully") ? "text-green-400" : "text-red-400"}`}>
+                  <p
+                    className={`text-sm ${changePasswordMessage.includes("successfully") ? "text-green-400" : "text-red-400"}`}
+                  >
                     {changePasswordMessage}
                   </p>
                 )}
@@ -789,7 +932,11 @@ const Dashboard = () => {
             status={metrics.temperature > 45 ? "Warning" : "Normal"}
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" stroke="currentColor" strokeWidth="2" />
+                <path
+                  d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
               </svg>
             }
           />
@@ -798,15 +945,27 @@ const Dashboard = () => {
             value={formatValue("rpm", metrics.rpm)}
             iconColor="blue"
             range="0-1,500"
-            status={metrics.rpm <= 1200
-              ? "Normal"
-              : metrics.rpm > 1200 && metrics.rpm <= 1500
-                ? "Optimal"
-                : "Warning"}
+            status={
+              metrics.rpm <= 1200
+                ? "Normal"
+                : metrics.rpm > 1200 && metrics.rpm <= 1500
+                  ? "Optimal"
+                  : "Warning"
+            }
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
-                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" stroke="currentColor" strokeWidth="2" />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="3"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M12 1v6m0 6v6m11-7h-6m-6 0H1"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
               </svg>
             }
           />
@@ -815,10 +974,18 @@ const Dashboard = () => {
             value={formatValue("voltage", metrics.voltage)}
             iconColor="yellow"
             range="220V ±5%"
-            status={metrics.voltage < 209 || metrics.voltage > 241 ? "Warning" : "Stable"}
+            status={
+              metrics.voltage < 209 || metrics.voltage > 241
+                ? "Warning"
+                : "Stable"
+            }
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z" stroke="currentColor" strokeWidth="2" />
+                <path
+                  d="M13 3L4 14h7l-1 7 9-11h-7l1-7z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
               </svg>
             }
           />
@@ -830,7 +997,11 @@ const Dashboard = () => {
             status={getCurrentStatus(metrics.current)}
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M13 3v10h4l-5 5v-10H7l5-5z" stroke="currentColor" strokeWidth="2" />
+                <path
+                  d="M13 3v10h4l-5 5v-10H7l5-5z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
               </svg>
             }
           />
@@ -838,11 +1009,19 @@ const Dashboard = () => {
             title="Energy Output"
             value={formatValue("kwh", metrics.kwh)}
             iconColor="green"
-            range={isToday() ? `Today: ${todayKwh.toFixed(1)} kWh` : `${selectedDate.toLocaleDateString()}: ${todayKwh.toFixed(1)} kWh`}
+            range={
+              isToday()
+                ? `Today: ${todayKwh.toFixed(1)} kWh`
+                : `${selectedDate.toLocaleDateString()}: ${todayKwh.toFixed(1)} kWh`
+            }
             status={getKwhStatus(metrics.kwh)}
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z" stroke="currentColor" strokeWidth="2" />
+                <path
+                  d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
                 <path d="M8 1v4m8-4v4" stroke="currentColor" strokeWidth="2" />
               </svg>
             }
@@ -857,7 +1036,7 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <input
                 type="date"
-                value={selectedDate.toISOString().split('T')[0]}
+                value={selectedDate.toISOString().split("T")[0]}
                 onChange={(e) => setSelectedDate(new Date(e.target.value))}
                 className="bg-slate-800/50 border border-teal-500/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 w-full sm:w-auto"
               />
@@ -907,27 +1086,44 @@ const Dashboard = () => {
             <StatusIndicator
               title="Turbine Operational"
               status={systemStatus.turbineOperational}
-              description={systemStatus.turbineOperational ? "Turbine running normally" : "Turbine offline or in maintenance"}
+              description={
+                systemStatus.turbineOperational
+                  ? "Turbine running normally"
+                  : "Turbine offline or in maintenance"
+              }
             />
             <StatusIndicator
               title="Grid Connection Stable"
               status={systemStatus.gridConnection}
-              description={systemStatus.gridConnection ? "Connected to power grid" : "Disconnected from grid"}
+              description={
+                systemStatus.gridConnection
+                  ? "Connected to power grid"
+                  : "Disconnected from grid"
+              }
             />
             <StatusIndicator
               title="All Sensors Active"
               status={systemStatus.sensorsActive}
-              description={systemStatus.sensorsActive ? "All sensors reporting data" : "Some sensors not responding"}
+              description={
+                systemStatus.sensorsActive
+                  ? "All sensors reporting data"
+                  : "Some sensors not responding"
+              }
             />
           </div>
 
           {/* Alerts Section */}
           {systemStatus.alerts.length > 0 && (
             <div className="mt-4">
-              <h4 className="text-md font-semibold mb-3 text-red-300">Active Alerts</h4>
+              <h4 className="text-md font-semibold mb-3 text-red-300">
+                Active Alerts
+              </h4>
               <div className="space-y-2">
-                {systemStatus.alerts.map(alert => (
-                  <div key={alert.id} className="flex items-center justify-between p-3 bg-red-400/10 rounded-lg border border-red-400/20">
+                {systemStatus.alerts.map((alert) => (
+                  <div
+                    key={alert.id}
+                    className="flex items-center justify-between p-3 bg-red-400/10 rounded-lg border border-red-400/20"
+                  >
                     <div className="flex items-center">
                       <div className="w-2 h-2 bg-red-400 rounded-full mr-2"></div>
                       <span className="text-sm">{alert.message}</span>
@@ -952,11 +1148,16 @@ const Dashboard = () => {
 const MetricCard = ({ title, value, iconColor, range, status, icon }) => {
   // Determine status color based on status text
   const getStatusColor = (status) => {
-    if (status.includes("Warning") || status.includes("Overload")) return "text-red-400";
-    if (status.includes("No Usage") || status.includes("No Load")) return "text-yellow-400";
-    if (status.includes("Low Usage") || status.includes("Low Load")) return "text-green-400";
-    if (status.includes("Normal Usage") || status.includes("Normal Load")) return "text-green-400";
-    if (status.includes("High Usage") || status.includes("High Load")) return "text-orange-400";
+    if (status.includes("Warning") || status.includes("Overload"))
+      return "text-red-400";
+    if (status.includes("No Usage") || status.includes("No Load"))
+      return "text-yellow-400";
+    if (status.includes("Low Usage") || status.includes("Low Load"))
+      return "text-green-400";
+    if (status.includes("Normal Usage") || status.includes("Normal Load"))
+      return "text-green-400";
+    if (status.includes("High Usage") || status.includes("High Load"))
+      return "text-orange-400";
     if (status.includes("Normal")) return "text-green-400";
     if (status.includes("Optimal")) return "text-green-400";
     if (status.includes("Stable")) return "text-green-400";
@@ -967,7 +1168,9 @@ const MetricCard = ({ title, value, iconColor, range, status, icon }) => {
     <div className="glass rounded-xl p-6 metric-card">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
-          <div className={`w-8 h-8 bg-${iconColor}-500/20 rounded-lg flex items-center justify-center`}>
+          <div
+            className={`w-8 h-8 bg-${iconColor}-500/20 rounded-lg flex items-center justify-center`}
+          >
             {icon}
           </div>
           <span className="text-sm text-teal-100/80">{title}</span>
@@ -982,7 +1185,9 @@ const MetricCard = ({ title, value, iconColor, range, status, icon }) => {
 
 const StatusIndicator = ({ title, status, description }) => (
   <div className="flex items-center space-x-3 p-3 bg-slate-800/30 rounded-lg">
-    <div className={`w-3 h-3 ${status ? "bg-green-400" : "bg-red-400"} rounded-full animate-pulse`}></div>
+    <div
+      className={`w-3 h-3 ${status ? "bg-green-400" : "bg-red-400"} rounded-full animate-pulse`}
+    ></div>
     <div>
       <div className="text-sm">{title}</div>
       <div className="text-xs text-teal-100/60">{description}</div>

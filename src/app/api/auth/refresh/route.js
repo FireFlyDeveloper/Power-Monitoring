@@ -11,14 +11,17 @@ export async function POST() {
     }
 
     // Replace with your actual refresh token URL
-    const response = await fetch(`https://power-monitoring-backend.onrender.com/auth/refresh`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.value}`,
+    const response = await fetch(
+      `https://power-monitoring-backend.onrender.com/auth/refresh`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.value}`,
+        },
+        body: JSON.stringify({ name: JSON.parse(authUserState.value).name }),
       },
-      body: JSON.stringify({ name: JSON.parse(authUserState.value).name}),
-    });
+    );
 
     if (!response.ok) {
       return NextResponse.json({ error: "Refresh failed" }, { status: 401 });
@@ -27,10 +30,16 @@ export async function POST() {
     const data = await response.json();
     const expires = new Date(Date.now() + 10 * 1000);
     cookie.set("session", data.token, { expires, httpOnly: true });
-    cookie.set("authUserState", JSON.stringify(data.authUserState), { expires, httpOnly: true });
+    cookie.set("authUserState", JSON.stringify(data.authUserState), {
+      expires,
+      httpOnly: true,
+    });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error refreshing token:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

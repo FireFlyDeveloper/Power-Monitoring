@@ -8,13 +8,16 @@ export async function middleware(request) {
 
   if (token) {
     try {
-      const res = await fetch("https://power-monitoring-backend.onrender.com/auth/check", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const res = await fetch(
+        "https://power-monitoring-backend.onrender.com/auth/check",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
       if (res.ok) {
         const data = await res.json();
