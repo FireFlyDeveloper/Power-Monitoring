@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -88,6 +88,24 @@ const Dashboard = () => {
     const today = new Date();
     return selectedDate.toDateString() === today.toDateString();
   };
+
+  const requestHistory = useCallback(() => {
+    if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
+
+    const start = new Date(selectedDate);
+    start.setHours(8, 0, 0, 0);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+    end.setHours(7, 59, 59, 999);
+
+    ws.current.send(
+      JSON.stringify({
+        action: "getHistory",
+        start: start.toISOString(),
+        end: end.toISOString(),
+      })
+    );
+  }, [selectedDate]);
 
   // Close popups when clicking outside
   useEffect(() => {
@@ -214,36 +232,18 @@ const Dashboard = () => {
     connectWebSocket();
 
     return () => clearTimeout(reconnectTimeout);
-  }, []);
+  }, [requestHistory]);
 
   // Request history when selected date changes
   useEffect(() => {
     requestHistory();
-  }, [selectedDate]);
+  }, [selectedDate, requestHistory]);
 
   // Request system status every minute
   useEffect(() => {
     const interval = setInterval(requestSystemStatus, 60 * 1000);
     return () => clearInterval(interval);
   }, []);
-
-  const requestHistory = () => {
-    if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
-
-    const start = new Date(selectedDate);
-    start.setHours(8, 0, 0, 0);
-    const end = new Date(start);
-    end.setDate(end.getDate() + 1);
-    end.setHours(7, 59, 59, 999);
-
-    ws.current.send(
-      JSON.stringify({
-        action: "getHistory",
-        start: start.toISOString(),
-        end: end.toISOString(),
-      })
-    );
-  };
 
   const requestSystemStatus = () => {
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return;
